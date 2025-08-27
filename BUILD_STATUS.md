@@ -6,10 +6,10 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Status
 
-✅ **Version**: v1.0.3 (Latest Stable)  
-✅ **Build Status**: All platforms building successfully  
+✅ **Version**: v1.0.4 (Latest Stable)  
+✅ **Build Status**: Windows builds successful  
 ✅ **Release Automation**: GitHub Actions fully operational  
-✅ **Cross-Platform Support**: Windows, macOS (Intel/ARM), Linux  
+✅ **Platform Support**: Windows 10/11 (64-bit)  
 
 ## Technical Configuration
 
@@ -26,20 +26,17 @@ This document provides a real-time snapshot of the current build and deployment 
 
 | Workflow | Trigger | Status | Purpose |
 |----------|---------|---------|---------|
-| **CI** (`ci.yml`) | Push/PR | ✅ Active | Cross-platform build validation |
-| **Release** (`release.yml`) | Version tags | ✅ Active | Production releases with binaries |
-| **Dev Builds** (`dev-builds.yml`) | Main branch | ✅ Active | Development artifacts |
+| **CI** (`ci.yml`) | Push/PR | ✅ Active | Windows build validation |
+| **Release** (`release.yml`) | Version tags | ✅ Active | Production releases with Windows executable |
+| **Dev Builds** (`dev-builds.yml`) | Main branch | ✅ Active | Development artifacts for Windows |
 
 ## Current Release Artifacts
 
-**Latest Release**: [v1.0.3](https://github.com/colinmxs/noita-savescummer/releases/latest)
+**Latest Release**: [v1.0.4](https://github.com/colinmxs/noita-savescummer/releases/latest)
 
 | Platform | Artifact Name | Status |
 |----------|---------------|---------|
-| Windows x64 | `noita-savescummer-windows-x64.exe` | ✅ Available |
-| macOS Intel | `noita-savescummer-macos-x64` | ✅ Available |
-| macOS ARM | `noita-savescummer-macos-arm64` | ✅ Available |
-| Linux x64 | `noita-savescummer-linux-x64` | ✅ Available |
+| Windows x64 | `noita-savescummer-windows-x64.zip` | ✅ Available |
 
 ## Known Issues & Solutions
 
@@ -47,7 +44,6 @@ This document provides a real-time snapshot of the current build and deployment 
 |-------|---------|----------|
 | **Windows SmartScreen Warning** | 🔄 Planned | Working on code signing implementation |
 | **Self-contained Size** | ✅ Optimized | Using PublishTrimmed and partial trimming |
-| **Cross-platform Paths** | ✅ Resolved | Using Path.Combine throughout |
 
 ### Windows SmartScreen Warning
 - **Issue**: "Microsoft Defender SmartScreen prevented an unrecognized app" 
@@ -57,6 +53,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Recent Fixes & Improvements
 
+- **v1.0.4**: Windows-only focus, removed unnecessary cross-platform code
 - **v1.0.3**: SmartScreen documentation and enhanced executable trust metadata
 - **v1.0.2**: Console icon display compatibility (Windows ?? fix)
 - **v1.0.1**: JSON serialization for self-contained builds
@@ -68,7 +65,7 @@ This document provides a real-time snapshot of the current build and deployment 
 # Verify local build works
 dotnet clean && dotnet build --configuration Release
 
-# Test cross-platform publishing (Windows example)
+# Test Windows build (example)
 dotnet publish -c Release -r win-x64 --self-contained -o test-build
 ./test-build/noita-savescummer.exe
 rm -rf test-build

@@ -8,35 +8,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: ['9.0.x']
-
-    steps:
-    - uses: actions/checkout@v4
+    runs-on: windows-latest
     
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-    
-    - name: Restore dependencies
-      run: dotnet restore
-    
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
-    
-    - name: Test
-      run: |
-        if [ -d "tests" ]; then
-          dotnet test --no-build --configuration Release --verbosity normal
-        else
-          echo "No tests found, skipping test step"
-        fi
-
-  code-quality:
-    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
@@ -48,10 +21,24 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     
-    - name: Build for analysis
+    - name: Build
       run: dotnet build --no-restore --configuration Release
     
-    - name: Run code analysis
+    - name: Test Windows build
       run: |
-        echo "Code quality checks passed"
-        # Future: Add actual static analysis tools here
+        if (Test-Path "tests") {
+          dotnet test --no-build --configuration Release --verbosity normal
+        } else {
+          Write-Host "No tests found, skipping test step"
+        }
+    
+    - name: Test self-contained publish
+      run: |
+        dotnet publish --configuration Release --runtime win-x64 --self-contained -p:PublishSingleFile=true -o test-publish
+        if (Test-Path "test-publish/noita-savescummer.exe") {
+          Write-Host "✅ Self-contained executable created successfully"
+          Remove-Item -Recurse -Force test-publish
+        } else {
+          Write-Error "❌ Failed to create self-contained executable"
+          exit 1
+        }

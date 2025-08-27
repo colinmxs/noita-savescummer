@@ -25,17 +25,13 @@ This application provides automated, timer-based backups of your Noita save file
 
 ## How to Run
 
-### 📥 Download Pre-built Executables (Recommended)
+### 📥 Download Pre-built Executable (Recommended)
 
 **Latest Stable Release:**
 1. Go to the [Releases page](https://github.com/colinmxs/noita-savescummer/releases/latest)
-2. Download the appropriate file for your system:
-   - **Windows**: `noita-savescummer-windows-x64.zip`
-   - **macOS (Intel)**: `noita-savescummer-macos-x64.tar.gz`
-   - **macOS (Apple Silicon)**: `noita-savescummer-macos-arm64.tar.gz`
-   - **Linux**: `noita-savescummer-linux-x64.tar.gz`
+2. Download **noita-savescummer-windows-x64.zip**
 3. Extract the archive
-4. Run the executable (see instructions below)
+4. Run `noita-savescummer.exe`
 
 **Development Builds (Latest Features):**
 - Check the [dev-latest release](https://github.com/colinmxs/noita-savescummer/releases/tag/dev-latest) for cutting-edge builds
@@ -57,16 +53,9 @@ If Windows Defender SmartScreen blocks the app with "Microsoft Defender SmartScr
 
 This happens because the executable isn't code-signed yet. The application is safe - you can verify by checking the source code in this repository.
 
-**macOS/Linux:**
-```bash
-# Extract, make executable, and run
-chmod +x noita-savescummer
-./noita-savescummer
-```
-
 ### Prerequisites
-- **No additional software required!** (Self-contained executables)
-- Windows 10/11, macOS 10.15+, or modern Linux distribution
+- **No additional software required!** (Self-contained executable)
+- Windows 10/11 (64-bit)
 - Noita installed in the standard location
 
 ### Installation & Usage
@@ -98,8 +87,8 @@ chmod +x noita-savescummer
 - **Version Management**: Configurable number of backup versions to maintain
 
 ### Requirements
-- **Self-contained executables** - No .NET runtime installation needed!
-- Cross-platform: Windows 10/11, macOS 10.15+, or modern Linux
+- **Self-contained executable** - No .NET runtime installation needed!
+- Windows 10/11 (64-bit)
 - Minimal system resource usage
 - Works with standard Noita installation paths
 

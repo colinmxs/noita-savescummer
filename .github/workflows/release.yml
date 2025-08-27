@@ -13,26 +13,10 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     
-    strategy:
-      matrix:
-        include:
-          - os: win-x64
-            extension: .exe
-            name: noita-savescummer-windows-x64
-          - os: linux-x64
-            extension: ''
-            name: noita-savescummer-linux-x64
-          - os: osx-x64
-            extension: ''
-            name: noita-savescummer-macos-x64
-          - os: osx-arm64
-            extension: ''
-            name: noita-savescummer-macos-arm64
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -45,54 +29,26 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Publish ${{ matrix.os }}
+    - name: Publish Windows x64
       run: |
-        dotnet publish \
-          --configuration Release \
-          --runtime ${{ matrix.os }} \
-          --self-contained true \
-          --output ./publish/${{ matrix.name }} \
-          -p:PublishSingleFile=true \
-          -p:PublishTrimmed=true \
-          -p:TrimMode=partial \
-          -p:DebugType=None \
+        dotnet publish `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output ./publish/noita-savescummer `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=true `
+          -p:TrimMode=partial `
+          -p:DebugType=None `
           -p:DebugSymbols=false
 
-    - name: Create archive for ${{ matrix.os }}
+    - name: Create archive
       run: |
-        cd ./publish
-        if [ "${{ matrix.os }}" = "win-x64" ]; then
-          zip -r ${{ matrix.name }}.zip ${{ matrix.name }}/
-        else
-          tar -czf ${{ matrix.name }}.tar.gz ${{ matrix.name }}/
-        fi
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.name }}
-        path: |
-          ./publish/${{ matrix.name }}.zip
-          ./publish/${{ matrix.name }}.tar.gz
-        retention-days: 90
-
-  create-release:
-    needs: build-and-release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: ./artifacts
+        Compress-Archive -Path ./publish/noita-savescummer/* -DestinationPath ./publish/noita-savescummer-windows-x64.zip
 
     - name: Get version
       id: version
+      shell: bash
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
@@ -108,33 +64,28 @@ jobs:
         body: |
           # Noita Save Scummer ${{ steps.version.outputs.version }}
           
-          ## 🎮 Ready-to-Run Downloads
+          ## 🎮 Windows Download
           
-          Choose the version for your operating system:
-          
-          ### Windows
-          - **noita-savescummer-windows-x64.zip** - For Windows 10/11 (64-bit)
-          
-          ### macOS
-          - **noita-savescummer-macos-x64.tar.gz** - For Intel Macs
-          - **noita-savescummer-macos-arm64.tar.gz** - For Apple Silicon Macs (M1/M2/M3)
-          
-          ### Linux
-          - **noita-savescummer-linux-x64.tar.gz** - For Linux distributions (64-bit)
+          **noita-savescummer-windows-x64.zip** - For Windows 10/11 (64-bit)
           
           ## 🚀 Installation
           
-          1. Download the appropriate file for your system
-          2. Extract the archive
-          3. Run the executable:
-             - Windows: Double-click `noita-savescummer.exe`
-             - macOS/Linux: `./noita-savescummer` (may need `chmod +x` first)
+          1. Download and extract the zip file
+          2. Run `noita-savescummer.exe`
+          
+          **⚠️ Windows Security Notice:**
+          If Windows Defender SmartScreen blocks the app:
+          1. Click "More info" in the dialog
+          2. Click "Run anyway" at the bottom
+          3. Alternative: Right-click exe → Properties → Check "Unblock" → Apply
+          
+          This happens because the executable isn't code-signed. The app is safe - source code is available for verification.
           
           ## 📋 Requirements
           
+          - Windows 10/11 (64-bit)
+          - Noita installed (obviously!)
           - No additional dependencies required (self-contained)
-          - Windows 10/11, macOS 10.15+, or modern Linux distribution
-          - Noita installed in standard location
           
           ## 🔄 What's New
           
@@ -146,11 +97,8 @@ jobs:
           
           ---
           
-          *Built with .NET 9.0 | Self-contained executables*
+          *Built with .NET 9.0 | Self-contained executable*
         draft: false
         prerelease: false
         files: |
-          ./artifacts/*/noita-savescummer-windows-x64.zip
-          ./artifacts/*/noita-savescummer-linux-x64.tar.gz
-          ./artifacts/*/noita-savescummer-macos-x64.tar.gz
-          ./artifacts/*/noita-savescummer-macos-arm64.tar.gz
+          ./publish/noita-savescummer-windows-x64.zip

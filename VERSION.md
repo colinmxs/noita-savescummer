@@ -1,8 +1,16 @@
 # Version Information
 
-Current Version: 1.0.3
+Current Version: 1.0.4
 
 ## Release Notes
+
+### v1.0.4 - Windows-Only Focus (August 26, 2025)
+- **Simplified**: Removed all cross-platform support (Noita is Windows-only!)
+- **Optimized**: Windows-only builds and workflows
+- **Streamlined**: Single Windows executable release
+- **Enhanced**: Faster builds with Windows-specific optimizations
+- **Cleaned**: Removed unnecessary macOS and Linux references from documentation
+- **Focused**: Dedicated Windows development and testing environment
 
 ### v1.0.3 - SmartScreen Documentation & Enhanced Trust (August 26, 2025)
 - **Added**: Comprehensive Windows SmartScreen workaround documentation
