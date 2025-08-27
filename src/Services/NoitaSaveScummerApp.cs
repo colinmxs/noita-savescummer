@@ -30,7 +30,7 @@ public class NoitaSaveScummerApp
 
         if (!Directory.Exists(_noitaSavePath))
         {
-            Console.WriteLine("❌ Noita save directory not found!");
+            Console.WriteLine($"{IconProvider.Error} Noita save directory not found!");
             Console.WriteLine($"Expected location: {_noitaSavePath}");
             Console.WriteLine("\nPlease ensure:");
             Console.WriteLine("• Noita has been run at least once");
@@ -47,13 +47,13 @@ public class NoitaSaveScummerApp
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Failed to create backup directory: {ex.Message}");
+            Console.WriteLine($"{IconProvider.Error} Failed to create backup directory: {ex.Message}");
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
             return false;
         }
 
-        Console.WriteLine("✅ Initialization complete!");
+        Console.WriteLine($"{IconProvider.Success} Initialization complete!");
         await Task.Delay(1000);
         return true;
     }
@@ -94,7 +94,7 @@ public class NoitaSaveScummerApp
             }
             catch (Exception ex)
             {
-                ConsoleDisplay.ShowMessage($"❌ Error: {ex.Message}");
+                ConsoleDisplay.ShowMessage($"{IconProvider.Error} Error: {ex.Message}");
                 await Task.Delay(3000);
             }
         }
@@ -146,7 +146,7 @@ public class NoitaSaveScummerApp
             
             if (availableBackups.Count == 0)
             {
-                ConsoleDisplay.ShowMessage("❌ No backups available to restore!");
+                ConsoleDisplay.ShowMessage($"{IconProvider.Error} No backups available to restore!");
                 await Task.Delay(2000);
                 ConsoleDisplay.ClearMessage();
                 return;
@@ -156,13 +156,13 @@ public class NoitaSaveScummerApp
             if (selectedBackup == null)
                 return;
 
-            ConsoleDisplay.ShowMessage("🔄 Restoring backup...");
+            ConsoleDisplay.ShowMessage($"{IconProvider.Hourglass} Restoring backup...");
             await _backupService.RestoreBackupAsync(selectedBackup);
-            ConsoleDisplay.ShowMessage("✅ Backup restored successfully!");
+            ConsoleDisplay.ShowMessage($"{IconProvider.Success} Backup restored successfully!");
         }
         catch (Exception ex)
         {
-            ConsoleDisplay.ShowMessage($"❌ Restore failed: {ex.Message}");
+            ConsoleDisplay.ShowMessage($"{IconProvider.Error} Restore failed: {ex.Message}");
         }
         
         await Task.Delay(2000);

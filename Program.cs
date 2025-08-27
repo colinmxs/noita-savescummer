@@ -32,6 +32,9 @@ class Program
                 return 1;
             }
 
+            // Initialize console encoding for better icon support
+            UI.IconProvider.Initialize();
+
             Console.Title = "Noita Save Scummer";
             Console.CancelKeyPress += OnCancelKeyPress;
 
