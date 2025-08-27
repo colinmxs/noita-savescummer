@@ -1,0 +1,156 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    strategy:
+      matrix:
+        include:
+          - os: win-x64
+            extension: .exe
+            name: noita-savescummer-windows-x64
+          - os: linux-x64
+            extension: ''
+            name: noita-savescummer-linux-x64
+          - os: osx-x64
+            extension: ''
+            name: noita-savescummer-macos-x64
+          - os: osx-arm64
+            extension: ''
+            name: noita-savescummer-macos-arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish ${{ matrix.os }}
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --runtime ${{ matrix.os }} \
+          --self-contained true \
+          --output ./publish/${{ matrix.name }} \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:TrimMode=partial \
+          -p:DebugType=None \
+          -p:DebugSymbols=false
+
+    - name: Create archive for ${{ matrix.os }}
+      run: |
+        cd ./publish
+        if [ "${{ matrix.os }}" = "win-x64" ]; then
+          zip -r ${{ matrix.name }}.zip ${{ matrix.name }}/
+        else
+          tar -czf ${{ matrix.name }}.tar.gz ${{ matrix.name }}/
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.name }}
+        path: |
+          ./publish/${{ matrix.name }}.zip
+          ./publish/${{ matrix.name }}.tar.gz
+        retention-days: 90
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Noita Save Scummer ${{ steps.version.outputs.version }}
+        body: |
+          # Noita Save Scummer ${{ steps.version.outputs.version }}
+          
+          ## 🎮 Ready-to-Run Downloads
+          
+          Choose the version for your operating system:
+          
+          ### Windows
+          - **noita-savescummer-windows-x64.zip** - For Windows 10/11 (64-bit)
+          
+          ### macOS
+          - **noita-savescummer-macos-x64.tar.gz** - For Intel Macs
+          - **noita-savescummer-macos-arm64.tar.gz** - For Apple Silicon Macs (M1/M2/M3)
+          
+          ### Linux
+          - **noita-savescummer-linux-x64.tar.gz** - For Linux distributions (64-bit)
+          
+          ## 🚀 Installation
+          
+          1. Download the appropriate file for your system
+          2. Extract the archive
+          3. Run the executable:
+             - Windows: Double-click `noita-savescummer.exe`
+             - macOS/Linux: `./noita-savescummer` (may need `chmod +x` first)
+          
+          ## 📋 Requirements
+          
+          - No additional dependencies required (self-contained)
+          - Windows 10/11, macOS 10.15+, or modern Linux distribution
+          - Noita installed in standard location
+          
+          ## 🔄 What's New
+          
+          - Automated backup system with configurable intervals
+          - Multiple versioned backups with cleanup
+          - Interactive restore with backup selection
+          - Pause/Resume functionality
+          - Clean, intuitive console interface
+          
+          ---
+          
+          *Built with .NET 9.0 | Self-contained executables*
+        draft: false
+        prerelease: false
+        files: |
+          ./artifacts/*/noita-savescummer-windows-x64.zip
+          ./artifacts/*/noita-savescummer-linux-x64.tar.gz
+          ./artifacts/*/noita-savescummer-macos-x64.tar.gz
+          ./artifacts/*/noita-savescummer-macos-arm64.tar.gz

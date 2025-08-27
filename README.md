@@ -1,5 +1,9 @@
 # Noita Save Scummer
 
+[![Build and Test](https://github.com/colinmxs/noita-savescummer/actions/workflows/ci.yml/badge.svg)](https://github.com/colinmxs/noita-savescummer/actions/workflows/ci.yml)
+[![Release](https://github.com/colinmxs/noita-savescummer/actions/workflows/release.yml/badge.svg)](https://github.com/colinmxs/noita-savescummer/actions/workflows/release.yml)
+[![Development Builds](https://github.com/colinmxs/noita-savescummer/actions/workflows/dev-builds.yml/badge.svg)](https://github.com/colinmxs/noita-savescummer/actions/workflows/dev-builds.yml)
+
 A lightweight console application for automated backup and restoration of Noita game saves.
 
 ## Purpose
@@ -21,16 +25,44 @@ This application provides automated, timer-based backups of your Noita save file
 
 ## How to Run
 
+### 📥 Download Pre-built Executables (Recommended)
+
+**Latest Stable Release:**
+1. Go to the [Releases page](https://github.com/colinmxs/noita-savescummer/releases/latest)
+2. Download the appropriate file for your system:
+   - **Windows**: `noita-savescummer-windows-x64.zip`
+   - **macOS (Intel)**: `noita-savescummer-macos-x64.tar.gz`
+   - **macOS (Apple Silicon)**: `noita-savescummer-macos-arm64.tar.gz`
+   - **Linux**: `noita-savescummer-linux-x64.tar.gz`
+3. Extract the archive
+4. Run the executable (see instructions below)
+
+**Development Builds (Latest Features):**
+- Check the [dev-latest release](https://github.com/colinmxs/noita-savescummer/releases/tag/dev-latest) for cutting-edge builds
+
+### 🚀 Running the Application
+
+**Windows:**
+```bash
+# Extract and run
+noita-savescummer.exe
+```
+
+**macOS/Linux:**
+```bash
+# Extract, make executable, and run
+chmod +x noita-savescummer
+./noita-savescummer
+```
+
 ### Prerequisites
-- Windows operating system
-- .NET 9.0 Runtime
+- **No additional software required!** (Self-contained executables)
+- Windows 10/11, macOS 10.15+, or modern Linux distribution
 - Noita installed in the standard location
 
 ### Installation & Usage
 
-1. **Download** the latest release or build from source
-2. **Run** `noita-savescummer.exe`
-3. **First-time setup**: 
+1. **First-time setup**: 
    - Enter your preferred backup interval in minutes
    - Choose how many backup versions to keep (recommended: 5-20)
 4. **Let it run**: The application will backup your saves automatically
@@ -57,10 +89,27 @@ This application provides automated, timer-based backups of your Noita save file
 - **Version Management**: Configurable number of backup versions to maintain
 
 ### Requirements
-- Built with .NET 9.0
-- No external dependencies
+- **Self-contained executables** - No .NET runtime installation needed!
+- Cross-platform: Windows 10/11, macOS 10.15+, or modern Linux
 - Minimal system resource usage
-- Compatible with Windows 10/11
+- Works with standard Noita installation paths
+
+## Building from Source
+
+If you prefer to build from source or contribute to development:
+
+```bash
+git clone https://github.com/colinmxs/noita-savescummer.git
+cd noita-savescummer
+dotnet build --configuration Release
+dotnet run
+```
+
+### Development
+- Built with .NET 9.0
+- Clean architecture with separated concerns
+- Comprehensive error handling
+- Async/await for responsive operations
 
 ## Troubleshooting
 

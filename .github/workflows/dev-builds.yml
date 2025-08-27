@@ -1,0 +1,121 @@
+name: Development Builds
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Get short SHA
+      id: vars
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build Windows (Development)
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --runtime win-x64 \
+          --self-contained true \
+          --output ./dev-builds/windows \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:TrimMode=partial
+
+    - name: Build Linux (Development)
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --runtime linux-x64 \
+          --self-contained true \
+          --output ./dev-builds/linux \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:TrimMode=partial
+
+    - name: Build macOS Intel (Development)
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --runtime osx-x64 \
+          --self-contained true \
+          --output ./dev-builds/macos-intel \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:TrimMode=partial
+
+    - name: Build macOS ARM (Development)
+      run: |
+        dotnet publish \
+          --configuration Release \
+          --runtime osx-arm64 \
+          --self-contained true \
+          --output ./dev-builds/macos-arm \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:TrimMode=partial
+
+    - name: Create development archives
+      run: |
+        cd ./dev-builds
+        zip -r noita-savescummer-dev-windows-${{ steps.vars.outputs.sha_short }}.zip windows/
+        tar -czf noita-savescummer-dev-linux-${{ steps.vars.outputs.sha_short }}.tar.gz linux/
+        tar -czf noita-savescummer-dev-macos-intel-${{ steps.vars.outputs.sha_short }}.tar.gz macos-intel/
+        tar -czf noita-savescummer-dev-macos-arm-${{ steps.vars.outputs.sha_short }}.tar.gz macos-arm/
+
+    - name: Upload development builds
+      uses: actions/upload-artifact@v4
+      with:
+        name: development-builds-${{ steps.vars.outputs.sha_short }}
+        path: |
+          ./dev-builds/*.zip
+          ./dev-builds/*.tar.gz
+        retention-days: 30
+
+    - name: Create or update development release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: dev-latest
+        name: "🚧 Development Build (Latest)"
+        body: |
+          # 🚧 Development Build - Latest Commit
+          
+          **⚠️ Development Build Warning**
+          These are automatic builds from the latest code. They may be unstable!
+          
+          **Commit:** ${{ github.sha }}
+          **Short SHA:** ${{ steps.vars.outputs.sha_short }}
+          **Built:** $(date -u)
+          
+          ## Downloads
+          
+          - `noita-savescummer-dev-windows-${{ steps.vars.outputs.sha_short }}.zip` - Windows
+          - `noita-savescummer-dev-linux-${{ steps.vars.outputs.sha_short }}.tar.gz` - Linux  
+          - `noita-savescummer-dev-macos-intel-${{ steps.vars.outputs.sha_short }}.tar.gz` - macOS Intel
+          - `noita-savescummer-dev-macos-arm-${{ steps.vars.outputs.sha_short }}.tar.gz` - macOS Apple Silicon
+          
+          ---
+          *For stable releases, check the main releases page*
+        draft: false
+        prerelease: true
+        files: |
+          ./dev-builds/noita-savescummer-dev-windows-${{ steps.vars.outputs.sha_short }}.zip
+          ./dev-builds/noita-savescummer-dev-linux-${{ steps.vars.outputs.sha_short }}.tar.gz
+          ./dev-builds/noita-savescummer-dev-macos-intel-${{ steps.vars.outputs.sha_short }}.tar.gz
+          ./dev-builds/noita-savescummer-dev-macos-arm-${{ steps.vars.outputs.sha_short }}.tar.gz
