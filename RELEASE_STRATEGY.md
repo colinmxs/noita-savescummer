@@ -2,6 +2,11 @@
 
 This document outlines the release strategy, versioning scheme, and operational procedures for the Noita Save Scummer repository. This guide is intended for maintainers and AI assistants working on this project.
 
+> **📋 Companion Documents:**
+> - [`BUILD_STATUS.md`](./BUILD_STATUS.md) - Current technical status and build health
+> - [`VERSION.md`](./VERSION.md) - Release history and changelog
+> - [`README.md`](./README.md) - User-facing documentation and features
+
 ## 📋 Table of Contents
 
 - [Repository Structure](#repository-structure)
@@ -244,11 +249,11 @@ dotnet build --configuration Release
 
 ## 📚 Additional Resources
 
-- **GitHub Actions**: `.github/workflows/` directory
-- **Build Status**: `BUILD_STATUS.md`
-- **Version History**: `VERSION.md`
-- **User Documentation**: `README.md`
-- **GitHub Copilot Instructions**: `.github/copilot-instructions.md`
+- **Current Build Status**: [`BUILD_STATUS.md`](./BUILD_STATUS.md) - Real-time status and technical configuration
+- **GitHub Actions**: `.github/workflows/` directory - Workflow definitions
+- **Version History**: [`VERSION.md`](./VERSION.md) - Detailed release notes and changelog
+- **User Documentation**: [`README.md`](./README.md) - End-user instructions and features
+- **GitHub Copilot Instructions**: [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) - AI assistant guidelines
 
 ## 🎯 Key Principles
 

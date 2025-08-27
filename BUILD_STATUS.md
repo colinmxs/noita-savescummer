@@ -1,62 +1,73 @@
 # Build Status
 
-This document tracks the current build and deployment status of the Noita Save Scummer application.
+This document provides a real-time snapshot of the current build and deployment status of the Noita Save Scummer application.
 
-## Current Setup
+> **📋 For operational procedures and release workflows, see [RELEASE_STRATEGY.md](./RELEASE_STRATEGY.md)**
 
-✅ **Application Code**: Clean architecture with separated concerns  
-✅ **Build Configuration**: .NET 9.0 with Release configuration  
-✅ **Cross-Platform Publishing**: Windows x64 self-contained builds working  
-✅ **GitHub Actions**: CI/CD workflows configured for automated builds  
+## Current Status
 
-## GitHub Actions Workflows
+✅ **Version**: v1.0.2 (Latest Stable)  
+✅ **Build Status**: All platforms building successfully  
+✅ **Release Automation**: GitHub Actions fully operational  
+✅ **Cross-Platform Support**: Windows, macOS (Intel/ARM), Linux  
 
-### 1. Continuous Integration (`ci.yml`)
-- **Trigger**: Every push and pull request
-- **Purpose**: Build and test the application
-- **Platforms**: Windows, macOS, Linux
-- **Framework**: .NET 9.0
+## Technical Configuration
 
-### 2. Release Builds (`release.yml`)
-- **Trigger**: Git tags (v*.*.*)
-- **Purpose**: Create releases with cross-platform executables
-- **Artifacts**: 
-  - Windows x64: `noita-savescummer-windows-x64.exe`
-  - macOS Intel: `noita-savescummer-macos-x64`
-  - macOS ARM: `noita-savescummer-macos-arm64`
-  - Linux x64: `noita-savescummer-linux-x64`
+| Component | Status | Details |
+|-----------|---------|---------|
+| **Framework** | ✅ Active | .NET 9.0 |
+| **Architecture** | ✅ Clean | Separated concerns (Models/Services/UI) |
+| **Dependencies** | ✅ Minimal | Built-in .NET libraries only |
+| **JSON Serialization** | ✅ Fixed | Source generation for AOT compatibility |
+| **Console Display** | ✅ Fixed | Unicode detection with ASCII fallback |
+| **Build Type** | ✅ Optimized | Self-contained executables |
 
-### 3. Development Builds (`dev-builds.yml`)
-- **Trigger**: Pushes to main branch
-- **Purpose**: Latest development builds
-- **Retention**: 90 days
-- **Artifacts**: Cross-platform binaries for testing
+## GitHub Actions Status
 
-## Next Steps
+| Workflow | Trigger | Status | Purpose |
+|----------|---------|---------|---------|
+| **CI** (`ci.yml`) | Push/PR | ✅ Active | Cross-platform build validation |
+| **Release** (`release.yml`) | Version tags | ✅ Active | Production releases with binaries |
+| **Dev Builds** (`dev-builds.yml`) | Main branch | ✅ Active | Development artifacts |
 
-To activate the automated builds:
-1. Commit and push all changes to GitHub
-2. Create a release tag (e.g., `git tag v1.0.0`) to trigger release builds
-3. Development builds will automatically run on main branch pushes
+## Current Release Artifacts
 
-## Manual Build Commands
+**Latest Release**: [v1.0.2](https://github.com/colinmxs/noita-savescummer/releases/latest)
 
-For local testing:
+| Platform | Artifact Name | Status |
+|----------|---------------|---------|
+| Windows x64 | `noita-savescummer-windows-x64.exe` | ✅ Available |
+| macOS Intel | `noita-savescummer-macos-x64` | ✅ Available |
+| macOS ARM | `noita-savescummer-macos-arm64` | ✅ Available |
+| Linux x64 | `noita-savescummer-linux-x64` | ✅ Available |
+
+## Recent Fixes & Improvements
+
+- **v1.0.2**: Console icon display compatibility (Windows ?? fix)
+- **v1.0.1**: JSON serialization for self-contained builds
+- **v1.0.0**: Initial stable release with full feature set
+
+## Quick Build Test
+
 ```bash
-# Build release configuration
-dotnet build --configuration Release
+# Verify local build works
+dotnet clean && dotnet build --configuration Release
 
-# Publish self-contained for Windows
-dotnet publish -c Release -r win-x64 --self-contained -o publish/win-x64
-
-# Publish self-contained for macOS (Intel)
-dotnet publish -c Release -r osx-x64 --self-contained -o publish/osx-x64
-
-# Publish self-contained for macOS (ARM)
-dotnet publish -c Release -r osx-arm64 --self-contained -o publish/osx-arm64
-
-# Publish self-contained for Linux
-dotnet publish -c Release -r linux-x64 --self-contained -o publish/linux-x64
+# Test cross-platform publishing (Windows example)
+dotnet publish -c Release -r win-x64 --self-contained -o test-build
+./test-build/noita-savescummer.exe
+rm -rf test-build
 ```
 
-Last Updated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+## Monitoring Links
+
+- **Actions**: [GitHub Actions](https://github.com/colinmxs/noita-savescummer/actions)
+- **Releases**: [GitHub Releases](https://github.com/colinmxs/noita-savescummer/releases)
+- **Issues**: [GitHub Issues](https://github.com/colinmxs/noita-savescummer/issues)
+
+---
+
+**Last Updated**: August 26, 2025  
+**Next Scheduled Review**: As needed based on releases
+
+> **💡 Tip**: This document reflects current status. For detailed operational procedures, version history, and release management, see [RELEASE_STRATEGY.md](./RELEASE_STRATEGY.md)
