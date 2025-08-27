@@ -48,6 +48,15 @@ This application provides automated, timer-based backups of your Noita save file
 noita-savescummer.exe
 ```
 
+**⚠️ Windows Security Notice:**
+If Windows Defender SmartScreen blocks the app with "Microsoft Defender SmartScreen prevented an unrecognized app from starting":
+
+1. **Click "More info"** in the SmartScreen dialog
+2. **Click "Run anyway"** at the bottom
+3. **Alternative**: Right-click the exe → Properties → General tab → Check "Unblock" → Apply → OK
+
+This happens because the executable isn't code-signed yet. The application is safe - you can verify by checking the source code in this repository.
+
 **macOS/Linux:**
 ```bash
 # Extract, make executable, and run
@@ -114,6 +123,12 @@ dotnet run
 ## Troubleshooting
 
 ### Common Issues
+
+**"Microsoft Defender SmartScreen prevented an unrecognized app from starting"**
+- Click "More info" then "Run anyway" in the SmartScreen dialog
+- Alternative: Right-click executable → Properties → Check "Unblock" → Apply
+- This occurs because the executable isn't code-signed (working on fixing this)
+- The application is completely safe - source code is available for verification
 
 **"Noita save directory not found"**
 - Ensure Noita has been run at least once to create the save directory

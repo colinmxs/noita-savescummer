@@ -6,6 +6,21 @@
     <RootNamespace>noita_savescummer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Assembly Information for Trust -->
+    <AssemblyTitle>Noita Save Scummer</AssemblyTitle>
+    <AssemblyDescription>Automated backup and restoration tool for Noita game saves</AssemblyDescription>
+    <AssemblyCompany>colinmxs</AssemblyCompany>
+    <AssemblyProduct>Noita Save Scummer</AssemblyProduct>
+    <AssemblyCopyright>Copyright © 2025 colinmxs</AssemblyCopyright>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+    <InformationalVersion>1.0.3</InformationalVersion>
+    
+    <!-- Additional Trust Properties -->
+    <ApplicationIcon />
+    <ApplicationManifest />
+    <Win32Resource />
   </PropertyGroup>
 
 </Project>

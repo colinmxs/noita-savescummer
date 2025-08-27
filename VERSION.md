@@ -1,8 +1,15 @@
 # Version Information
 
-Current Version: 1.0.2
+Current Version: 1.0.3
 
 ## Release Notes
+
+### v1.0.3 - SmartScreen Documentation & Enhanced Trust (August 26, 2025)
+- **Added**: Comprehensive Windows SmartScreen workaround documentation
+- **Enhanced**: Assembly metadata for improved executable trust (company, product, version info)
+- **Improved**: User guidance for handling Windows security warnings
+- **Updated**: README with detailed SmartScreen bypass instructions
+- **Added**: Troubleshooting section for common security dialog issues
 
 ### v1.0.2 - Console Display Fix (August 26, 2025)
 - **Fixed**: Console icon display issues on Windows (showing ?? instead of icons)

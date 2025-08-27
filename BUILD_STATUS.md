@@ -6,7 +6,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Status
 
-✅ **Version**: v1.0.2 (Latest Stable)  
+✅ **Version**: v1.0.3 (Latest Stable)  
 ✅ **Build Status**: All platforms building successfully  
 ✅ **Release Automation**: GitHub Actions fully operational  
 ✅ **Cross-Platform Support**: Windows, macOS (Intel/ARM), Linux  
@@ -32,7 +32,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Release Artifacts
 
-**Latest Release**: [v1.0.2](https://github.com/colinmxs/noita-savescummer/releases/latest)
+**Latest Release**: [v1.0.3](https://github.com/colinmxs/noita-savescummer/releases/latest)
 
 | Platform | Artifact Name | Status |
 |----------|---------------|---------|
@@ -41,8 +41,23 @@ This document provides a real-time snapshot of the current build and deployment 
 | macOS ARM | `noita-savescummer-macos-arm64` | ✅ Available |
 | Linux x64 | `noita-savescummer-linux-x64` | ✅ Available |
 
+## Known Issues & Solutions
+
+| Issue | Status | Solution |
+|-------|---------|----------|
+| **Windows SmartScreen Warning** | 🔄 Planned | Working on code signing implementation |
+| **Self-contained Size** | ✅ Optimized | Using PublishTrimmed and partial trimming |
+| **Cross-platform Paths** | ✅ Resolved | Using Path.Combine throughout |
+
+### Windows SmartScreen Warning
+- **Issue**: "Microsoft Defender SmartScreen prevented an unrecognized app" 
+- **Cause**: Unsigned executable without established reputation
+- **Workaround**: Click "More info" → "Run anyway" or unblock in Properties
+- **Permanent Fix**: Code signing certificate (in progress)
+
 ## Recent Fixes & Improvements
 
+- **v1.0.3**: SmartScreen documentation and enhanced executable trust metadata
 - **v1.0.2**: Console icon display compatibility (Windows ?? fix)
 - **v1.0.1**: JSON serialization for self-contained builds
 - **v1.0.0**: Initial stable release with full feature set
