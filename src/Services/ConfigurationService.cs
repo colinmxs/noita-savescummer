@@ -28,7 +28,7 @@ public class ConfigurationService : IConfigurationService
             }
 
             var json = await File.ReadAllTextAsync(_configPath);
-            var config = JsonSerializer.Deserialize<Configuration>(json);
+            var config = JsonSerializer.Deserialize(json, NoitaSaveScummerJsonContext.Default.Configuration);
             return config ?? new Configuration { BackupIntervalMinutes = 0, MaxBackupVersions = 5 };
         }
         catch
@@ -41,7 +41,13 @@ public class ConfigurationService : IConfigurationService
     {
         try
         {
-            var json = JsonSerializer.Serialize(configuration, new JsonSerializerOptions { WriteIndented = true });
+            var directoryPath = Path.GetDirectoryName(_configPath);
+            if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            var json = JsonSerializer.Serialize(configuration, NoitaSaveScummerJsonContext.Default.Configuration);
             await File.WriteAllTextAsync(_configPath, json);
         }
         catch (Exception ex)
