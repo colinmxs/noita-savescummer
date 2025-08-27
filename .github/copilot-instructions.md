@@ -2,7 +2,7 @@
 
 ## Project Overview & Context
 
-This is a .NET 9.0 console application for automatically backing up and restoring Noita game saves. The project emphasizes simplicity, reliability, and cross-platform compatibility with automated distribution via GitHub Actions.
+This is a .NET 9.0 console application for automatically backing up and restoring Noita game saves. The project emphasizes simplicity, reliability, and Windows optimization with automated distribution via GitHub Actions.
 
 ## Code Standards & Guidelines
 
@@ -33,10 +33,10 @@ This is a .NET 9.0 console application for automatically backing up and restorin
 - Use consistent formatting and layout
 - Show progress and status information clearly
 - Handle edge cases gracefully with helpful error messages
-- **Use IconProvider for all UI icons** - provides cross-platform compatibility with Unicode fallback
+- **Use IconProvider for all UI icons** - provides Unicode support with ASCII fallback for Windows console compatibility
 
 ### File Operations
-- Always use Path.Combine() for cross-platform path handling
+- Always use Path.Combine() for Windows path handling
 - Implement proper file locking and error recovery
 - Use async file operations for better responsiveness
 - Validate paths and permissions before operations
@@ -58,9 +58,9 @@ This is a .NET 9.0 console application for automatically backing up and restorin
 ## Release Management & Distribution
 
 ### GitHub Actions Workflows
-- **CI Workflow**: Validates builds on all platforms for every push/PR
-- **Release Workflow**: Creates cross-platform binaries when version tags are pushed
-- **Dev Builds Workflow**: Generates latest artifacts for main branch pushes
+- **CI Workflow**: Validates builds on Windows for every push/PR
+- **Release Workflow**: Creates Windows binaries when version tags are pushed
+- **Dev Builds Workflow**: Generates latest Windows artifacts for main branch pushes
 
 ### Version Management
 - Follow semantic versioning (vX.Y.Z)
@@ -77,11 +77,11 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-### Cross-Platform Considerations
+### Windows Considerations
 - Test self-contained publishing: `dotnet publish -c Release -r win-x64 --self-contained`
 - Ensure JSON serialization uses JsonSerializerContext for AOT compatibility
 - Use IconProvider for console display to handle Unicode/ASCII fallback
-- Verify builds work on Windows, macOS (Intel/ARM), and Linux
+- Verify builds work on Windows 10/11 (64-bit)
 
 ## Documentation Strategy
 
@@ -110,7 +110,7 @@ var json = JsonSerializer.Serialize(configuration, NoitaSaveScummerJsonContext.D
 [JsonSerializable(typeof(NewModel))]
 ```
 
-### Console Display (Cross-Platform Icons)
+### Console Display (Windows Icons)
 ```csharp
 // Always use IconProvider instead of hardcoded emojis
 Console.WriteLine($"{IconProvider.Success} Operation completed!");

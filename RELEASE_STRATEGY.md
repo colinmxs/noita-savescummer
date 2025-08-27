@@ -62,20 +62,20 @@ We follow semantic versioning: `MAJOR.MINOR.PATCH`
 
 ### 1. Continuous Integration (`ci.yml`)
 - **Trigger**: Push to any branch, all pull requests
-- **Purpose**: Validate code quality and cross-platform builds
-- **Platforms**: Windows, macOS (Intel/ARM), Linux
+- **Purpose**: Validate code quality and Windows builds
+- **Platform**: Windows 10/11 (64-bit)
 - **Actions**: Build, test, validate
 
 ### 2. Release Builds (`release.yml`)
 - **Trigger**: Git tags matching `v*.*.*`
-- **Purpose**: Create official releases with cross-platform binaries
-- **Artifacts**: Self-contained executables for all platforms
+- **Purpose**: Create official releases with Windows executable
+- **Artifacts**: Self-contained Windows executable
 - **Distribution**: GitHub Releases page
 
 ### 3. Development Builds (`dev-builds.yml`)
 - **Trigger**: Push to `main` branch
 - **Purpose**: Latest development artifacts for testing
-- **Retention**: 90 days
+- **Retention**: 30 days
 - **Access**: GitHub Actions artifacts
 
 ## 📦 Release Process
@@ -160,7 +160,7 @@ dotnet restore
 dotnet build
 dotnet run  # Test locally
 
-# Test cross-platform publishing
+# Test Windows publishing
 dotnet publish -c Release -r win-x64 --self-contained -o test-publish
 ./test-publish/noita-savescummer.exe  # Test executable
 rm -rf test-publish  # Clean up
@@ -222,7 +222,7 @@ git tag --sort=-version:refname | head -10
 
 ### Build Failures
 1. **JSON Serialization Issues**: Ensure JsonContext is updated for new models
-2. **Cross-Platform Issues**: Test on different platforms or check CI logs
+2. **Windows Build Issues**: Check CI logs for Windows-specific problems
 3. **Dependency Issues**: Verify no third-party packages are added
 
 ### Release Issues
@@ -259,7 +259,7 @@ dotnet build --configuration Release
 
 1. **Automation First**: Let GitHub Actions handle builds and releases
 2. **Semantic Versioning**: Always use meaningful version numbers
-3. **Cross-Platform**: Ensure all releases work on Windows, macOS, and Linux
+3. **Windows Focus**: Optimized for Windows 10/11 (Noita's platform)
 4. **Self-Contained**: Executables should not require .NET installation
 5. **Documentation**: Keep all documentation up to date with changes
 6. **Simplicity**: Maintain the "no third-party dependencies" rule
@@ -267,5 +267,5 @@ dotnet build --configuration Release
 ---
 
 **Last Updated**: August 26, 2025  
-**Current Version**: v1.0.2  
+**Current Version**: v1.0.4  
 **Next Planned Version**: TBD based on feature requests and issues
