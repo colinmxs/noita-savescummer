@@ -6,7 +6,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Status
 
-✅ **Version**: v1.0.4 (Latest Stable)  
+✅ **Version**: v1.1.0 (Development - Player Restore Feature)  
 ✅ **Build Status**: Windows builds successful  
 ✅ **Release Automation**: GitHub Actions fully operational  
 ✅ **Platform Support**: Windows 10/11 (64-bit)  
@@ -20,6 +20,7 @@ This document provides a real-time snapshot of the current build and deployment 
 | **Dependencies** | ✅ Minimal | Built-in .NET libraries only |
 | **JSON Serialization** | ✅ Fixed | Source generation for AOT compatibility |
 | **Console Display** | ✅ Fixed | Unicode detection with ASCII fallback |
+| **Restore Options** | ✅ Enhanced | Full save + Player-only restore |
 | **Build Type** | ✅ Optimized | Self-contained executables |
 
 ## GitHub Actions Status
@@ -32,11 +33,12 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Release Artifacts
 
-**Latest Release**: [v1.0.4](https://github.com/colinmxs/noita-savescummer/releases/latest)
+**Latest Release**: [v1.0.4](https://github.com/colinmxs/noita-savescummer/releases/latest)  
+**Development**: v1.1.0 (Player-only restore feature in progress)
 
 | Platform | Artifact Name | Status |
 |----------|---------------|---------|
-| Windows x64 | `noita-savescummer-windows-x64.zip` | ✅ Available |
+| Windows x64 | `noita-savescummer-windows-x64.zip` | ✅ Available (v1.0.4) |
 
 ## Known Issues & Solutions
 
@@ -53,6 +55,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Recent Fixes & Improvements
 
+- **v1.1.0**: Player-only restore feature (F8) - restore character while preserving world
 - **v1.0.4**: Windows-only focus, removed unnecessary cross-platform code
 - **v1.0.3**: SmartScreen documentation and enhanced executable trust metadata
 - **v1.0.2**: Console icon display compatibility (Windows ?? fix)
@@ -79,7 +82,7 @@ rm -rf test-build
 
 ---
 
-**Last Updated**: August 26, 2025  
+**Last Updated**: August 29, 2025  
 **Next Scheduled Review**: As needed based on releases
 
 > **💡 Tip**: This document reflects current status. For detailed operational procedures, version history, and release management, see [RELEASE_STRATEGY.md](./RELEASE_STRATEGY.md)

@@ -121,6 +121,10 @@ public class NoitaSaveScummerApp
                 await HandleRestoreAsync();
                 break;
                 
+            case ConsoleKey.F8:
+                await HandleRestorePlayerOnlyAsync();
+                break;
+                
             case ConsoleKey.P:
                 HandlePauseResume();
                 break;
@@ -163,6 +167,50 @@ public class NoitaSaveScummerApp
         catch (Exception ex)
         {
             ConsoleDisplay.ShowMessage($"{IconProvider.Error} Restore failed: {ex.Message}");
+        }
+        
+        await Task.Delay(2000);
+        ConsoleDisplay.ClearMessage();
+    }
+
+    private async Task HandleRestorePlayerOnlyAsync()
+    {
+        try
+        {
+            var availableBackups = _backupService.GetAvailableBackups();
+            
+            if (availableBackups.Count == 0)
+            {
+                ConsoleDisplay.ShowMessage($"{IconProvider.Error} No backups available to restore!");
+                await Task.Delay(2000);
+                ConsoleDisplay.ClearMessage();
+                return;
+            }
+
+            var (selectedBackup, resetLocation) = BackupSelectionMenu.SelectBackupToRestorePlayerOnly(availableBackups);
+            if (selectedBackup == null)
+                return;
+
+            var config = await _configService.LoadAsync();
+            
+            ConsoleDisplay.ShowMessage($"{IconProvider.Hourglass} Restoring player.xml...");
+            await _backupService.RestorePlayerOnlyAsync(
+                selectedBackup, 
+                resetLocation, 
+                config.DefaultPlayerPositionX, 
+                config.DefaultPlayerPositionY);
+            
+            var locationMsg = resetLocation ? " (location reset)" : "";
+            ConsoleDisplay.ShowMessage($"{IconProvider.Success} Player.xml restored successfully{locationMsg}!");
+        }
+        catch (OperationCanceledException)
+        {
+            // User cancelled, just return
+            return;
+        }
+        catch (Exception ex)
+        {
+            ConsoleDisplay.ShowMessage($"{IconProvider.Error} Player restore failed: {ex.Message}");
         }
         
         await Task.Delay(2000);

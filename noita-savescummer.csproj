@@ -17,9 +17,9 @@
     <AssemblyCompany>colinmxs</AssemblyCompany>
     <AssemblyProduct>Noita Save Scummer</AssemblyProduct>
     <AssemblyCopyright>Copyright © 2025 colinmxs</AssemblyCopyright>
-    <AssemblyVersion>1.0.4.0</AssemblyVersion>
-    <FileVersion>1.0.4.0</FileVersion>
-    <InformationalVersion>1.0.4</InformationalVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1.0</InformationalVersion>
     
     <!-- Additional Trust Properties -->
     <ApplicationIcon />

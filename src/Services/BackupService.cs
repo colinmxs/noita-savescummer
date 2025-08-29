@@ -1,4 +1,5 @@
 using NoitaSaveScummer.Models;
+using System.Xml;
 
 namespace NoitaSaveScummer.Services;
 
@@ -6,6 +7,7 @@ public interface IBackupService
 {
     Task CreateBackupAsync();
     Task RestoreBackupAsync(string backupName);
+    Task RestorePlayerOnlyAsync(string backupName, bool resetLocation = false, double posX = 215.0, double posY = -95.0);
     List<BackupInfo> GetAvailableBackups();
     Task CleanupOldBackupsAsync(int maxVersions);
 }
@@ -61,6 +63,58 @@ public class BackupService : IBackupService
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Failed to restore backup: {ex.Message}", ex);
+        }
+    }
+
+    public async Task RestorePlayerOnlyAsync(string backupName, bool resetLocation = false, double posX = 215.0, double posY = -95.0)
+    {
+        try
+        {
+            var backupPath = Path.Combine(_backupsPath, backupName);
+            
+            if (!Directory.Exists(backupPath))
+            {
+                throw new InvalidOperationException($"Backup '{backupName}' not found");
+            }
+
+            var playerXmlBackupPath = Path.Combine(backupPath, "player.xml");
+            if (!File.Exists(playerXmlBackupPath))
+            {
+                throw new InvalidOperationException($"player.xml not found in backup '{backupName}'");
+            }
+
+            var playerXmlDestPath = Path.Combine(_savePath, "player.xml");
+            
+            // Ensure the save directory exists
+            Directory.CreateDirectory(_savePath);
+            
+            if (resetLocation)
+            {
+                // Read the XML, modify the position, then save
+                var xmlDoc = new XmlDocument();
+                await Task.Run(() => xmlDoc.Load(playerXmlBackupPath));
+                
+                var transformNode = xmlDoc.SelectSingleNode("//Entity/_Transform");
+                if (transformNode != null)
+                {
+                    var posXAttr = transformNode.Attributes?["position.x"];
+                    var posYAttr = transformNode.Attributes?["position.y"];
+                    
+                    if (posXAttr != null) posXAttr.Value = posX.ToString("F6");
+                    if (posYAttr != null) posYAttr.Value = posY.ToString("F6");
+                }
+                
+                await Task.Run(() => xmlDoc.Save(playerXmlDestPath));
+            }
+            else
+            {
+                // Copy the file as-is
+                await Task.Run(() => File.Copy(playerXmlBackupPath, playerXmlDestPath, true));
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to restore player.xml: {ex.Message}", ex);
         }
     }
 

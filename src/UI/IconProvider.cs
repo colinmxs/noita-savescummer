@@ -36,6 +36,7 @@ public static class IconProvider
     public static string Document => _supportsUnicode ? "📝" : "[Log]";
     public static string Target => _supportsUnicode ? "🎯" : "[Ctrl]";
     public static string Wave => _supportsUnicode ? "👋" : "[Exit]";
+    public static string Player => _supportsUnicode ? "👤" : "[User]";
     
     // Status icons
     public static string Success => _supportsUnicode ? "✅" : "[OK]";

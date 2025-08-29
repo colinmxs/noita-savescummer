@@ -1,8 +1,19 @@
 # Version Information
 
-Current Version: 1.0.4
+Current Version: 1.1.0
 
 ## Release Notes
+
+### v1.1.0 - Player-Only Restore Feature (August 29, 2025)
+- **Added**: Player-only restore functionality (F8 key)
+- **Enhanced**: Dual restore options - full save (F9) or player.xml only (F8)
+- **Added**: Optional player location reset during F8 restore
+- **Improved**: Interactive restore process with location choice (Y/N/ESC)
+- **Enhanced**: XML manipulation to modify player position coordinates
+- **Added**: New player icon in IconProvider for UI consistency
+- **Updated**: Console interface to show both restore options clearly
+- **Benefit**: Allows restoring character state while preserving world progress
+- **Feature**: Reset player to cave entrance or keep backup position
 
 ### v1.0.4 - Windows-Only Focus (August 26, 2025)
 - **Simplified**: Removed all cross-platform support (Noita is Windows-only!)
