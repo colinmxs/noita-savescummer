@@ -6,7 +6,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Current Status
 
-✅ **Version**: v1.1.0 (Development - Player Restore Feature)  
+✅ **Version**: v1.2.0 (Development - Backup Preservation Feature)  
 ✅ **Build Status**: Windows builds successful  
 ✅ **Release Automation**: GitHub Actions fully operational  
 ✅ **Platform Support**: Windows 10/11 (64-bit)  
@@ -21,6 +21,7 @@ This document provides a real-time snapshot of the current build and deployment 
 | **JSON Serialization** | ✅ Fixed | Source generation for AOT compatibility |
 | **Console Display** | ✅ Fixed | Unicode detection with ASCII fallback |
 | **Restore Options** | ✅ Enhanced | Full save + Player-only restore |
+| **Backup Preservation** | ✅ Active | Protect backups from cleanup with F7 |
 | **Build Type** | ✅ Optimized | Self-contained executables |
 
 ## GitHub Actions Status
@@ -34,7 +35,7 @@ This document provides a real-time snapshot of the current build and deployment 
 ## Current Release Artifacts
 
 **Latest Release**: [v1.0.4](https://github.com/colinmxs/noita-savescummer/releases/latest)  
-**Development**: v1.1.0 (Player-only restore feature in progress)
+**Development**: v1.2.0 (Backup preservation feature completed)
 
 | Platform | Artifact Name | Status |
 |----------|---------------|---------|
@@ -55,6 +56,7 @@ This document provides a real-time snapshot of the current build and deployment 
 
 ## Recent Fixes & Improvements
 
+- **v1.2.0**: Backup preservation feature (F7) - protect important saves from cleanup
 - **v1.1.0**: Player-only restore feature (F8) - restore character while preserving world
 - **v1.0.4**: Windows-only focus, removed unnecessary cross-platform code
 - **v1.0.3**: SmartScreen documentation and enhanced executable trust metadata

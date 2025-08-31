@@ -125,6 +125,10 @@ public class NoitaSaveScummerApp
                 await HandleRestorePlayerOnlyAsync();
                 break;
                 
+            case ConsoleKey.F7:
+                await HandlePreservationAsync();
+                break;
+                
             case ConsoleKey.P:
                 HandlePauseResume();
                 break;
@@ -211,6 +215,40 @@ public class NoitaSaveScummerApp
         catch (Exception ex)
         {
             ConsoleDisplay.ShowMessage($"{IconProvider.Error} Player restore failed: {ex.Message}");
+        }
+        
+        await Task.Delay(2000);
+        ConsoleDisplay.ClearMessage();
+    }
+
+    private async Task HandlePreservationAsync()
+    {
+        try
+        {
+            var availableBackups = _backupService.GetAvailableBackups();
+            
+            if (availableBackups.Count == 0)
+            {
+                ConsoleDisplay.ShowMessage($"{IconProvider.Error} No backups available to manage!");
+                await Task.Delay(2000);
+                ConsoleDisplay.ClearMessage();
+                return;
+            }
+
+            var selectedBackup = BackupSelectionMenu.SelectBackupToPreserve(availableBackups);
+            if (selectedBackup == null)
+                return;
+
+            _backupService.ToggleBackupPreservation(selectedBackup);
+            
+            var isNowPreserved = _backupService.IsBackupPreserved(selectedBackup);
+            var statusMessage = isNowPreserved ? "preserved" : "unpreserved";
+            
+            ConsoleDisplay.ShowMessage($"{IconProvider.Success} Backup {statusMessage} successfully!");
+        }
+        catch (Exception ex)
+        {
+            ConsoleDisplay.ShowMessage($"{IconProvider.Error} Preservation operation failed: {ex.Message}");
         }
         
         await Task.Delay(2000);

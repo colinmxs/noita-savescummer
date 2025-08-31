@@ -42,6 +42,7 @@ public static class ConsoleDisplay
         Console.WriteLine($"{IconProvider.Target} Controls:");
         Console.WriteLine("   F9  - Select and restore backup (full save)");
         Console.WriteLine("   F8  - Select and restore player.xml only");
+        Console.WriteLine("   F7  - Manage backup preservation");
         Console.WriteLine("   P   - Pause/Resume timer");
         Console.WriteLine("   C   - Configure settings");
         Console.WriteLine("   Q   - Quit application");

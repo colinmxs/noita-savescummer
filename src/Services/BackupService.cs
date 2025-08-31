@@ -10,17 +10,21 @@ public interface IBackupService
     Task RestorePlayerOnlyAsync(string backupName, bool resetLocation = false, double posX = 215.0, double posY = -95.0);
     List<BackupInfo> GetAvailableBackups();
     Task CleanupOldBackupsAsync(int maxVersions);
+    void ToggleBackupPreservation(string backupName);
+    bool IsBackupPreserved(string backupName);
 }
 
 public class BackupService : IBackupService
 {
     private readonly string _savePath;
     private readonly string _backupsPath;
+    private readonly PreservationService _preservationService;
 
     public BackupService(string savePath, string backupsPath)
     {
         _savePath = savePath;
         _backupsPath = backupsPath;
+        _preservationService = new PreservationService(_backupsPath);
     }
 
     public async Task CreateBackupAsync()
@@ -133,7 +137,8 @@ public class BackupService : IBackupService
                 {
                     Name = name,
                     Timestamp = DateTime.ParseExact(name, "yyyy-MM-dd_HH-mm-ss", null),
-                    FolderPath = Path.Combine(_backupsPath, name)
+                    FolderPath = Path.Combine(_backupsPath, name),
+                    IsPreserved = _preservationService.IsPreserved(Path.Combine(_backupsPath, name))
                 })
                 .OrderByDescending(b => b.Timestamp)
                 .ToList();
@@ -152,7 +157,9 @@ public class BackupService : IBackupService
 
             if (backups.Count > maxVersions)
             {
-                var backupsToDelete = backups.Skip(maxVersions);
+                var backupsToDelete = backups
+                    .Where(b => !b.IsPreserved)  // Don't delete preserved backups
+                    .Skip(maxVersions);
                 
                 foreach (var backup in backupsToDelete)
                 {
@@ -161,6 +168,10 @@ public class BackupService : IBackupService
                         Directory.Delete(backup.FolderPath, true);
                     }
                 }
+                
+                // Clean up preservation metadata for deleted backups
+                var remainingBackups = backups.Where(b => Directory.Exists(b.FolderPath));
+                _preservationService.CleanupDeletedBackups(remainingBackups.Select(b => b.FolderPath));
             }
         }
         catch
@@ -193,5 +204,17 @@ public class BackupService : IBackupService
             var destSubDir = Path.Combine(destDir, subDir.Name);
             await CopyDirectoryAsync(subDir.FullName, destSubDir);
         }
+    }
+
+    public void ToggleBackupPreservation(string backupName)
+    {
+        var backupPath = Path.Combine(_backupsPath, backupName);
+        _preservationService.TogglePreservation(backupPath);
+    }
+
+    public bool IsBackupPreserved(string backupName)
+    {
+        var backupPath = Path.Combine(_backupsPath, backupName);
+        return _preservationService.IsPreserved(backupPath);
     }
 }

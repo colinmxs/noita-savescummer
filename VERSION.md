@@ -1,8 +1,20 @@
 # Version Information
 
-Current Version: 1.1.0
+Current Version: 1.2.0
 
 ## Release Notes
+
+### v1.2.0 - Backup Preservation Feature (August 31, 2025)
+- **Added**: Backup preservation system (F7 key)
+- **Enhanced**: Protect important backups from automatic cleanup
+- **Added**: Visual preservation indicators with lock/unlock icons
+- **Improved**: Preservation state persisted in JSON metadata
+- **Added**: New preservation icons in IconProvider (Lock, Unlock, Pin)
+- **Enhanced**: Backup cleanup logic now respects preserved backups
+- **Added**: PreservationService for managing backup metadata
+- **Updated**: Console interface to show F7 preservation management
+- **Benefit**: Keep critical save states safe from automatic deletion
+- **Feature**: Toggle preservation status for any backup individually
 
 ### v1.1.0 - Player-Only Restore Feature (August 29, 2025)
 - **Added**: Player-only restore functionality (F8 key)

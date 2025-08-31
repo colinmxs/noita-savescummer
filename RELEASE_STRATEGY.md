@@ -266,6 +266,6 @@ dotnet build --configuration Release
 
 ---
 
-**Last Updated**: August 29, 2025  
-**Current Version**: v1.1.0  
+**Last Updated**: August 31, 2025  
+**Current Version**: v1.2.0  
 **Next Planned Version**: TBD based on feature requests and issues

@@ -37,6 +37,9 @@ public static class IconProvider
     public static string Target => _supportsUnicode ? "🎯" : "[Ctrl]";
     public static string Wave => _supportsUnicode ? "👋" : "[Exit]";
     public static string Player => _supportsUnicode ? "👤" : "[User]";
+    public static string Lock => _supportsUnicode ? "🔒" : "[LOCK]";
+    public static string Unlock => _supportsUnicode ? "🔓" : "[UNLK]";
+    public static string Pin => _supportsUnicode ? "📌" : "[PIN]";
     
     // Status icons
     public static string Success => _supportsUnicode ? "✅" : "[OK]";

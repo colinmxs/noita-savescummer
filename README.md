@@ -17,6 +17,7 @@ This application provides automated, timer-based backups of your Noita save file
 - **Interactive Restore**: Select from available backup versions when restoring
 - **Full Save Restore**: Press F9 to choose and restore complete save (world + player)
 - **Player-Only Restore**: Press F8 to restore just player.xml (preserves world state)
+- **Backup Preservation**: Press F7 to protect important backups from automatic cleanup
 - **Pause/Resume**: Pause the backup timer when needed with the P key
 - **Persistent Configuration**: Your settings are saved and remembered
 - **Single Instance Protection**: Prevents multiple copies from running simultaneously
@@ -68,12 +69,13 @@ This happens because the executable isn't code-signed yet. The application is sa
 5. **Restore options**: 
    - Press F9 for full save restore (world + player)
    - Press F8 for player-only restore (preserves world, restores character)
-   - **For F8**: Exit to main menu first, then start a new run after restoring
+   - **For F8**: Ensure you have an existing save/world or it will be overwritten
 
 ### Controls
 
 - **F9**: Select and restore from available backup versions (full save)
 - **F8**: Select and restore player.xml only (preserves world/progress)
+- **F7**: Manage backup preservation (protect backups from cleanup)
 - **P**: Pause/Resume the backup timer
 - **C**: Configure backup interval and version count
 - **Q**: Quit application safely
@@ -88,25 +90,45 @@ This happens because the executable isn't code-signed yet. The application is sa
 **Player-Only Restore (F8)**:
 - Restores only the player.xml file (character stats, inventory, spells, etc.)
 - Preserves the current world state and progress
-- **IMPORTANT**: You must start a new run in Noita before using player-only restore
-- The game needs to be at the character selection/starting screen for player.xml to take effect
+- **IMPORTANT**: Ensure a save/world exists before using player-only restore or it will be overwritten by Noita
 - **Location Reset Option**: Choose whether to reset player to starting position or keep current location
 - Ideal for character experimentation, spell testing, or recovering from player death
 - Maintains world exploration progress, unlocks, and environmental changes
 
+**Backup Preservation (F7)**:
+- Protect important backups from automatic cleanup
+- Toggle preservation status for any backup individually
+- Preserved backups are marked with lock icons and never deleted
+- Perfect for keeping critical save states safe (e.g., before boss fights, rare discoveries)
+- Preservation state persists across application restarts
+- Use for milestone saves you want to keep permanently
+
 ### Player-Only Restore Workflow
 
-1. **Exit current run**: If you're in an active Noita run, exit to main menu
+1. **Ensure save exists**: Make sure you have an existing save/world in Noita (otherwise it will be overwritten)
 2. **Use player restore**: Press F8 in the save scummer and select your backup
 3. **Choose location option**: 
    - **Yes**: Reset player to cave entrance (starting position)
    - **No**: Keep player at their current location from the backup
-4. **Start new run**: Launch a new run in Noita - your restored character will load
-5. **Continue playing**: Your character state is restored while keeping world progress
+4. **Continue in Noita**: Your character state is restored while keeping world progress
+5. **Play normally**: Your restored character stats/inventory are now active in the current world
 
-> **Note**: Player-only restore will not work if you try to continue an existing run. You must start fresh for the player.xml changes to be applied.
+> **Note**: Player-only restore works with existing saves and doesn't require starting a new run. Just ensure you have a world/save before restoring.
 
 > **Location Reset**: If you choose to reset location, your character will spawn at the cave entrance regardless of where they were when the backup was made. This is useful for escaping dangerous areas or starting fresh exploration.
+
+### Backup Preservation Workflow
+
+1. **Identify important saves**: Look for backups before boss fights, rare discoveries, or perfect runs
+2. **Access preservation menu**: Press F7 in the save scummer main interface
+3. **Select backup**: Choose the backup you want to preserve from the numbered list
+4. **Toggle preservation**: The backup will be marked with a lock icon and "[PRESERVED]" status
+5. **Verify protection**: Preserved backups will never be deleted during automatic cleanup
+6. **Manage over time**: Use F7 anytime to preserve new backups or unpreserve old ones
+
+> **Tip**: Preserve backups before major world changes, boss attempts, or when you have rare items/spells you don't want to lose.
+
+> **Note**: Preserved backups don't count toward your maximum backup limit - only regular backups are cleaned up automatically.
 
 ## Technical Details
 
@@ -118,11 +140,13 @@ This happens because the executable isn't code-signed yet. The application is sa
 ### Backup System
 - **Timestamped Backups**: Each backup is stored with format `YYYY-MM-DD_HH-MM-SS`
 - **Automatic Cleanup**: Old backups beyond your configured limit are automatically removed
+- **Backup Preservation**: Mark important backups to protect them from cleanup
 - **Dual Restore Options**: Choose between full save restore or player-only restore
 - **Full Restore (F9)**: Restores complete save including world state and player data
 - **Player Restore (F8)**: Restores only player.xml, preserving current world/progress
 - **Location Reset**: Optional player location reset to starting position during F8 restore
 - **Version Management**: Configurable number of backup versions to maintain
+- **Preservation Management**: Preserved backups are never deleted during cleanup
 
 ### Requirements
 - **Self-contained executable** - No .NET runtime installation needed!

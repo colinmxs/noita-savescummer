@@ -96,4 +96,53 @@ public static class BackupSelectionMenu
             }
         }
     }
+    
+    public static string? SelectBackupToPreserve(List<BackupInfo> backups)
+    {
+        return SelectBackupForPreservation(backups, "Manage Backup Preservation");
+    }
+    
+    private static string? SelectBackupForPreservation(List<BackupInfo> backups, string title)
+    {
+        if (!backups.Any())
+        {
+            Console.Clear();
+            Console.WriteLine($"{IconProvider.Save} {title}\n");
+            Console.WriteLine("No backups available.");
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey(true);
+            return null;
+        }
+
+        Console.Clear();
+        Console.WriteLine($"{IconProvider.Pin} {title}\n");
+        
+        for (int i = 0; i < Math.Min(backups.Count, 9); i++)
+        {
+            var backup = backups[i];
+            var preserveIcon = backup.IsPreserved ? IconProvider.Lock : IconProvider.Unlock;
+            var preserveText = backup.IsPreserved ? "[PRESERVED]" : "[Normal]";
+            Console.WriteLine($"{i + 1}. {preserveIcon} {backup.Name} - {backup.Timestamp:yyyy-MM-dd HH:mm:ss} {preserveText}");
+        }
+
+        Console.WriteLine("\nSelect a backup to toggle preservation:");
+        Console.WriteLine("Enter backup number (1-9) or ESC to cancel");
+        
+        while (true)
+        {
+            var keyInfo = Console.ReadKey(true);
+            
+            if (keyInfo.Key == ConsoleKey.Escape)
+                return null;
+                
+            if (char.IsDigit(keyInfo.KeyChar))
+            {
+                var index = int.Parse(keyInfo.KeyChar.ToString()) - 1;
+                if (index >= 0 && index < Math.Min(backups.Count, 9))
+                {
+                    return backups[index].Name;
+                }
+            }
+        }
+    }
 }
