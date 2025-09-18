@@ -39,7 +39,7 @@ When you first run the application, you will be asked to configure:
 
 ## Restore Options
 
-- **Full Restore (F9)**: Reverts your game to a previous state completely. Use this to recover from a death or to practice a specific part of the game.
+- **Full Restore (F9)**: Reverts your game to a previous state completely. This process is now safer, restoring only essential world and player data to prevent save corruption. Use this to recover from a death or to practice a specific part of the game.
 
 - **Player-Only Restore (F8)**: Restores your character's health, inventory, and stats from a backup, but keeps the current world map. This is useful if you want to continue exploring the current world with a previous version of your character. You can choose to either respawn at the cave entrance or at your character's last saved location.
 

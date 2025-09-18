@@ -2,6 +2,9 @@
 
 This document contains the release history and changelog for the Noita Save Scummer.
 
+## Version 1.2.1
+*   **Critical Fix**: Overhauled the full restore (F9) logic to prevent world corruption. The restore process now only copies essential files (`player.xml`, `world_state.xml`, and the `world` folder), significantly improving safety and reliability.
+
 ## Version 1.2.0
 *   **Feature**: Added a backup preservation system (F7) to protect important backups from automatic deletion.
 

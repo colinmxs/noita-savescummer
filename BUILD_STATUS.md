@@ -4,7 +4,7 @@ This document provides a summary of the project's current build status and techn
 
 ## Current Status
 
-- **Version**: v1.2.0
+- **Version**: v1.2.1
 - **Framework**: .NET 9.0
 - **Platform**: Windows 10/11 (64-bit)
 - **Builds**: Automated builds for Windows are passing.

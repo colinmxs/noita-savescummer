@@ -56,13 +56,30 @@ public class BackupService : IBackupService
                 throw new InvalidOperationException($"Backup '{backupName}' not found");
             }
 
-            if (Directory.Exists(_savePath))
-            {
-                Directory.Delete(_savePath, true);
-            }
-
+            // Ensure save directory exists
             Directory.CreateDirectory(_savePath);
-            await CopyDirectoryAsync(backupPath, _savePath);
+
+            // Copy specific files only: player.xml and world_state.xml
+            await CopyFileIfExistsAsync(
+                Path.Combine(backupPath, "player.xml"),
+                Path.Combine(_savePath, "player.xml"));
+
+            await CopyFileIfExistsAsync(
+                Path.Combine(backupPath, "world_state.xml"),
+                Path.Combine(_savePath, "world_state.xml"));
+
+            // Copy world directory if it exists
+            var sourceWorldDir = Path.Combine(backupPath, "world");
+            var destWorldDir = Path.Combine(_savePath, "world");
+            
+            if (Directory.Exists(sourceWorldDir))
+            {
+                if (Directory.Exists(destWorldDir))
+                {
+                    Directory.Delete(destWorldDir, true);
+                }
+                await CopyDirectoryAsync(sourceWorldDir, destWorldDir);
+            }
         }
         catch (Exception ex)
         {
@@ -180,6 +197,14 @@ public class BackupService : IBackupService
         }
         
         return Task.CompletedTask;
+    }
+
+    private static async Task CopyFileIfExistsAsync(string sourceFile, string destFile)
+    {
+        if (File.Exists(sourceFile))
+        {
+            await Task.Run(() => File.Copy(sourceFile, destFile, true));
+        }
     }
 
     private static async Task CopyDirectoryAsync(string sourceDir, string destDir)
