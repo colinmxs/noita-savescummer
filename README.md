@@ -8,12 +8,7 @@ A lightweight console application for automatically backing up and restoring Noi
 
 ## Features
 
-- **Automated Backups**: Automatically creates backups of your `save00` directory on a timer.
-- **Manual Restore**: Interactively restore a previous save state.
-- **Full & Partial Restores**: Restore the entire save directory (F9) or only the player data (F8).
-- **Backup Preservation**: Protect important backups from automatic deletion (F7).
-- **Configurable**: Set the backup frequency and the number of backups to keep.
-- **Background Operation**: Runs in the console and waits for user input.
+Automatically backs up your Noita saves on a timer and lets you restore them with hotkeys when you die or want to retry something.
 
 ## How to Use
 
