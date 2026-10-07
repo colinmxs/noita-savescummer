@@ -2,6 +2,20 @@
 
 This document contains the release history and changelog for the Noita Save Scummer.
 
+## Version 2.0.0
+*   **Critical Fix**: Restored worlds no longer have misaligned backgrounds or missing structures. Backups are checked for writes during the copy and retried. Restores are blocked while Noita runs. A full restore swaps in a complete `save00` atomically, so no files from the newer run survive (including `session_numbers.salakieli` and new chunks).
+*   **Critical Fix**: Preserved backups (F7) were lost in released builds because the preservation file used reflection-based JSON, which trimmed builds disable.
+*   **Fix**: A failed backup no longer leaves partial folders, retries every 3 seconds or deletes good backups through retention.
+*   **Fix**: Player-only position reset writes invariant-culture numbers (it used to write `215,000000` on non-English Windows).
+*   **Fix**: Single-instance mutex no longer crashes on exit; Ctrl+C and Q shut down cleanly.
+*   **Fix**: Countdowns over one hour, settings resetting other options, status messages overwriting controls, flicker.
+*   **Feature**: Automatic `[CLEAN]` backup when Noita exits; skip unchanged timed backups.
+*   **Feature**: Global hotkeys Ctrl+Alt+F5 (quick-save) and Ctrl+Alt+F9 (quick-load: close Noita, restore, relaunch).
+*   **Feature**: Automatic undo backup before every restore (U to undo).
+*   **Feature**: Full restore keeps current unlocks/stats by default.
+*   **Feature**: B = back up now. Paged menus show every backup with tags. Recent backups appear on the main screen. Path overrides.
+*   **Dev**: xUnit test suite (30 tests), CI runs tests and a trimmed publish, release notes link here.
+
 ## Version 1.2.1
 *   **Critical Fix**: Overhauled the full restore (F9) logic to prevent world corruption. The restore process now only copies essential files (`player.xml`, `world_state.xml`, and the `world` folder), significantly improving safety and reliability.
 

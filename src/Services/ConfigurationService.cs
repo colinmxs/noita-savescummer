@@ -18,41 +18,31 @@ public class ConfigurationService : IConfigurationService
         _configPath = configPath;
     }
 
+    /// <summary>Set when config.json existed but was unreadable (it is kept as config.json.corrupt).</summary>
+    public string? LoadWarning { get; private set; }
+
     public async Task<Configuration> LoadAsync()
     {
+        if (!File.Exists(_configPath))
+            return new Configuration { BackupIntervalMinutes = 0 };
+
         try
         {
-            if (!File.Exists(_configPath))
-            {
-                return new Configuration { BackupIntervalMinutes = 0, MaxBackupVersions = 5 };
-            }
-
             var json = await File.ReadAllTextAsync(_configPath);
-            var config = JsonSerializer.Deserialize(json, NoitaSaveScummerJsonContext.Default.Configuration);
-            return config ?? new Configuration { BackupIntervalMinutes = 0, MaxBackupVersions = 5 };
+            return JsonSerializer.Deserialize(json, NoitaSaveScummerJsonContext.Default.Configuration)
+                   ?? new Configuration { BackupIntervalMinutes = 0 };
         }
-        catch
+        catch (JsonException ex)
         {
-            return new Configuration { BackupIntervalMinutes = 0, MaxBackupVersions = 5 };
+            File.Move(_configPath, _configPath + ".corrupt", overwrite: true);
+            LoadWarning = $"config.json was unreadable ({ex.Message}); saved as config.json.corrupt.";
+            return new Configuration { BackupIntervalMinutes = 0 };
         }
     }
 
     public async Task SaveAsync(Configuration configuration)
     {
-        try
-        {
-            var directoryPath = Path.GetDirectoryName(_configPath);
-            if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-
-            var json = JsonSerializer.Serialize(configuration, NoitaSaveScummerJsonContext.Default.Configuration);
-            await File.WriteAllTextAsync(_configPath, json);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to save configuration: {ex.Message}", ex);
-        }
+        var json = JsonSerializer.Serialize(configuration, NoitaSaveScummerJsonContext.Default.Configuration);
+        await FileOps.WriteAllTextAtomicAsync(_configPath, json);
     }
 }

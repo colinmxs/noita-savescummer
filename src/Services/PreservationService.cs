@@ -1,93 +1,66 @@
 using System.Text.Json;
-using NoitaSaveScummer.Services;
 
 namespace NoitaSaveScummer.Services;
 
-public class PreservationService
+/// <summary>Stores which backups are protected from retention cleanup (backups/preserved_backups.json).</summary>
+public sealed class PreservationService
 {
-    private readonly string _preservationFilePath;
-    private Dictionary<string, bool> _preservedBackups;
+    public const string FileName = "preserved_backups.json";
 
-    public PreservationService(string saveDirectory)
+    private readonly string _filePath;
+    private readonly Dictionary<string, bool> _preserved;
+
+    public PreservationService(string backupsDirectory)
     {
-        _preservationFilePath = Path.Combine(saveDirectory, "preserved_backups.json");
-        _preservedBackups = new Dictionary<string, bool>();
-        LoadPreservationData();
+        _filePath = Path.Combine(backupsDirectory, FileName);
+        _preserved = Load(out var warning);
+        LoadWarning = warning;
     }
 
-    public bool IsPreserved(string backupPath)
+    /// <summary>Set when the file existed but could not be read; the bad file is kept as *.corrupt.</summary>
+    public string? LoadWarning { get; }
+
+    public bool IsPreserved(string backupName) =>
+        _preserved.TryGetValue(backupName, out var preserved) && preserved;
+
+    public void SetPreserved(string backupName, bool preserve)
     {
-        var fileName = Path.GetFileName(backupPath);
-        return _preservedBackups.TryGetValue(fileName, out var preserved) && preserved;
+        if (preserve) _preserved[backupName] = true;
+        else _preserved.Remove(backupName);
+        Save();
     }
 
-    public void SetPreservation(string backupPath, bool preserve)
+    public void RemoveMissing(IEnumerable<string> existingBackupNames)
     {
-        var fileName = Path.GetFileName(backupPath);
-        if (preserve)
-        {
-            _preservedBackups[fileName] = true;
-        }
-        else
-        {
-            _preservedBackups.Remove(fileName);
-        }
-        SavePreservationData();
+        var existing = existingBackupNames.ToHashSet(StringComparer.Ordinal);
+        var stale = _preserved.Keys.Where(k => !existing.Contains(k)).ToList();
+        if (stale.Count == 0) return;
+        foreach (var key in stale) _preserved.Remove(key);
+        Save();
     }
 
-    public void TogglePreservation(string backupPath)
+    private Dictionary<string, bool> Load(out string? warning)
     {
-        var fileName = Path.GetFileName(backupPath);
-        var currentState = IsPreserved(backupPath);
-        SetPreservation(backupPath, !currentState);
-    }
-
-    public void CleanupDeletedBackups(IEnumerable<string> existingBackupPaths)
-    {
-        var existingFileNames = existingBackupPaths.Select(Path.GetFileName).ToHashSet();
-        var keysToRemove = _preservedBackups.Keys.Where(k => !existingFileNames.Contains(k)).ToList();
-        
-        foreach (var key in keysToRemove)
-        {
-            _preservedBackups.Remove(key);
-        }
-        
-        if (keysToRemove.Count > 0)
-        {
-            SavePreservationData();
-        }
-    }
-
-    private void LoadPreservationData()
-    {
+        warning = null;
+        if (!File.Exists(_filePath)) return new Dictionary<string, bool>(StringComparer.Ordinal);
         try
         {
-            if (File.Exists(_preservationFilePath))
-            {
-                var json = File.ReadAllText(_preservationFilePath);
-                var options = new JsonSerializerOptions();
-                _preservedBackups = JsonSerializer.Deserialize<Dictionary<string, bool>>(json, options) 
-                                   ?? new Dictionary<string, bool>();
-            }
+            var json = File.ReadAllText(_filePath);
+            var data = JsonSerializer.Deserialize(json, NoitaSaveScummerJsonContext.Default.DictionaryStringBoolean);
+            return new Dictionary<string, bool>(data ?? [], StringComparer.Ordinal);
         }
-        catch
+        catch (JsonException ex)
         {
-            // If there's any error loading, start fresh
-            _preservedBackups = new Dictionary<string, bool>();
+            var corruptPath = _filePath + ".corrupt";
+            File.Move(_filePath, corruptPath, overwrite: true);
+            warning = $"Preservation list was unreadable ({ex.Message}); moved to {Path.GetFileName(corruptPath)}.";
+            return new Dictionary<string, bool>(StringComparer.Ordinal);
         }
     }
 
-    private void SavePreservationData()
+    private void Save()
     {
-        try
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var json = JsonSerializer.Serialize(_preservedBackups, options);
-            File.WriteAllText(_preservationFilePath, json);
-        }
-        catch
-        {
-            // Silently fail to avoid disrupting application flow
-        }
+        var json = JsonSerializer.Serialize(_preserved, NoitaSaveScummerJsonContext.Default.DictionaryStringBoolean);
+        FileOps.WriteAllTextAtomic(_filePath, json);
     }
 }

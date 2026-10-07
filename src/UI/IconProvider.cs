@@ -5,29 +5,27 @@ namespace NoitaSaveScummer.UI;
 public static class IconProvider
 {
     private static readonly bool _supportsUnicode;
-    
+
     static IconProvider()
     {
-        // Check if console supports Unicode by testing current encoding
-        _supportsUnicode = Console.OutputEncoding.EncodingName.Contains("UTF") || 
-                          Console.OutputEncoding.CodePage == 65001; // UTF-8 code page
-        
-        // Try to enable UTF-8 for better Unicode support on Windows
+        _supportsUnicode = Console.OutputEncoding.CodePage == 65001 ||
+                           Console.OutputEncoding.EncodingName.Contains("UTF", StringComparison.OrdinalIgnoreCase);
         try
         {
-            if (!_supportsUnicode && Environment.OSVersion.Platform == PlatformID.Win32NT)
+            if (!_supportsUnicode && OperatingSystem.IsWindows())
             {
                 Console.OutputEncoding = Encoding.UTF8;
                 _supportsUnicode = true;
             }
         }
-        catch
+        catch (IOException)
         {
-            // If we can't set UTF-8, fall back to ASCII icons
+            // Can't switch encoding; fall back to ASCII icons.
         }
     }
-    
-    // Application icons
+
+    public static bool SupportsUnicode => _supportsUnicode;
+
     public static string Game => _supportsUnicode ? "🎮" : "[Game]";
     public static string Folder => _supportsUnicode ? "📁" : "[Dir]";
     public static string Save => _supportsUnicode ? "💾" : "[Save]";
@@ -40,25 +38,24 @@ public static class IconProvider
     public static string Lock => _supportsUnicode ? "🔒" : "[LOCK]";
     public static string Unlock => _supportsUnicode ? "🔓" : "[UNLK]";
     public static string Pin => _supportsUnicode ? "📌" : "[PIN]";
-    
-    // Status icons
+    public static string Undo => _supportsUnicode ? "↩" : "[Undo]";
+    public static string Bolt => _supportsUnicode ? "⚡" : "[Fast]";
+
     public static string Success => _supportsUnicode ? "✅" : "[OK]";
     public static string Error => _supportsUnicode ? "❌" : "[ERR]";
     public static string Warning => _supportsUnicode ? "⚠️" : "[WARN]";
     public static string Info => _supportsUnicode ? "ℹ️" : "[INFO]";
-    
-    // Timer icons
+
     public static string Timer => _supportsUnicode ? "⏱️" : "[Time]";
     public static string Hourglass => _supportsUnicode ? "⏳" : "[Wait]";
     public static string Pause => _supportsUnicode ? "⏸️" : "[Pause]";
     public static string Play => _supportsUnicode ? "▶️" : "[Play]";
-    
-    // Separators
+
     public static string Separator => _supportsUnicode ? "═" : "=";
-    
+    public static string Pointer => _supportsUnicode ? "▶" : ">";
+
+    /// <summary>Forces the static constructor (console encoding setup) to run early.</summary>
     public static void Initialize()
     {
-        // This method can be called to ensure static initialization
-        // and apply console encoding settings early in the application
     }
 }

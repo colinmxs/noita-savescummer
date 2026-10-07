@@ -1,97 +1,74 @@
-using System.Threading;
 using NoitaSaveScummer.Services;
 using NoitaSaveScummer.UI;
 
 namespace NoitaSaveScummer;
 
-class Program
+internal static class Program
 {
-    private static readonly string NoitaSavePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-        @"AppData\LocalLow\Nolla_Games_Noita\save00");
-    
-    private static readonly string BackupBasePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-        "NoitaSaveBackups");
-    
-    private static readonly string BackupsPath = Path.Combine(BackupBasePath, "backups");
-    private static readonly string ConfigPath = Path.Combine(BackupBasePath, "config.json");
-    
-    private static readonly Mutex AppMutex = new(true, "NoitaSaveScummer_SingleInstance");
-    private static NoitaSaveScummerApp? _app;
-
-    static async Task<int> Main(string[] args)
+    // Synchronous Main: the mutex must be acquired and released on the same thread,
+    // which an async Main does not guarantee after an await.
+    private static int Main(string[] args)
     {
+        using var mutex = new Mutex(initiallyOwned: false, @"Local\NoitaSaveScummer_SingleInstance");
+        bool ownsMutex;
         try
         {
-            if (!AppMutex.WaitOne(TimeSpan.Zero, true))
-            {
-                Console.WriteLine("Noita Save Scummer is already running!");
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
-                return 1;
-            }
+            ownsMutex = mutex.WaitOne(TimeSpan.Zero);
+        }
+        catch (AbandonedMutexException)
+        {
+            ownsMutex = true; // previous instance crashed; ownership passes to us
+        }
 
-            // Initialize console encoding for better icon support
-            UI.IconProvider.Initialize();
+        if (!ownsMutex)
+        {
+            Console.WriteLine("Noita Save Scummer is already running.");
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey(intercept: true);
+            return 1;
+        }
 
+        try
+        {
+            return RunAsync(args).GetAwaiter().GetResult();
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
+    }
+
+    private static async Task<int> RunAsync(string[] args)
+    {
+        using var shutdown = new CancellationTokenSource();
+        Console.CancelKeyPress += (_, e) =>
+        {
+            e.Cancel = true; // exit through the main loop so a running backup can finish
+            shutdown.Cancel();
+        };
+
+        try
+        {
+            IconProvider.Initialize();
             Console.Title = "Noita Save Scummer";
-            Console.CancelKeyPress += OnCancelKeyPress;
 
-            var configService = new ConfigurationService(ConfigPath);
-            var backupService = new BackupService(NoitaSavePath, BackupsPath);
-            
-            _app = new NoitaSaveScummerApp(NoitaSavePath, BackupsPath, configService, backupService);
+            var paths = AppPaths.Resolve(args);
+            var configService = new ConfigurationService(paths.ConfigPath);
+            var backupService = new BackupService(paths.SavePath, paths.BackupsPath);
+            using var app = new NoitaSaveScummerApp(paths, configService, backupService, new NoitaProcess());
 
-            if (!await _app.InitializeAsync())
-            {
-                return 1;
-            }
-
-            await _app.RunAsync();
+            if (!app.Initialize()) return 1;
+            await app.RunAsync(shutdown.Token);
+            ConsoleDisplay.ShowShutdownMessage();
             return 0;
         }
         catch (Exception ex)
         {
-            Console.Clear();
-            Console.WriteLine($"Fatal error: {ex.Message}");
+            Console.WriteLine();
+            Console.WriteLine($"Fatal error: {ex}");
             Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            Console.ReadKey(intercept: true);
             return 1;
-        }
-        finally
-        {
-            AppMutex?.ReleaseMutex();
-            AppMutex?.Dispose();
-        }
-    }
-
-    private static void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
-    {
-        e.Cancel = true;
-        
-        try
-        {
-            _app?.Stop();
-            ConsoleDisplay.ShowShutdownMessage();
-            Task.Delay(500).Wait();
-        }
-        catch
-        {
-            // Ignore exceptions during shutdown
-        }
-        finally
-        {
-            try
-            {
-                AppMutex?.ReleaseMutex();
-            }
-            catch
-            {
-                // Ignore mutex release exceptions during shutdown
-            }
-            
-            Environment.Exit(0);
         }
     }
 }
