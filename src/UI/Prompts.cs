@@ -52,6 +52,20 @@ public static class Prompts
         };
     }
 
+    public static ConsoleKey? AskWandAction(ConsoleRenderer renderer, int templateCount) =>
+        Ask(renderer,
+        [
+            $"{IconProvider.Bolt} Wand tools",
+            string.Empty,
+            "Copies a real wand between saves, e.g. a black hole wand into a fresh run.",
+            "Workflow: get the wand once in any run, Save & Quit, press S. In a new run,",
+            "Save & Quit right after starting, press G, then Continue in Noita.",
+            string.Empty,
+            "S   - Save a wand from the current save00 as a template",
+            $"G   - Give a saved wand to the current run ({templateCount} saved)",
+            "Esc - Back",
+        ], ConsoleKey.S, ConsoleKey.G);
+
     public static bool Confirm(ConsoleRenderer renderer, string title, params string[] body)
     {
         var lines = new List<string> { title, string.Empty };

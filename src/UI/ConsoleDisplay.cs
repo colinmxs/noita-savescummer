@@ -52,7 +52,7 @@ public static class ConsoleDisplay
         lines.Add("Controls (this window):");
         lines.Add("   F9 Full restore        F8 Player-only restore   F7 Preserve/unpreserve");
         lines.Add("   U  Undo last restore   B  Back up now           P  Pause/resume timer");
-        lines.Add("   C  Settings            Q  Quit");
+        lines.Add("   F6 Wand tools          C  Settings              Q  Quit");
         if (m.HotkeyProblem is null)
             lines.Add($"Global (in-game): {HotkeyBindings.LabelFor(HotkeyAction.QuickSave)} quick-save, " +
                       $"{HotkeyBindings.LabelFor(HotkeyAction.QuickLoad)} quick-load (closes Noita, restores newest, relaunches)");

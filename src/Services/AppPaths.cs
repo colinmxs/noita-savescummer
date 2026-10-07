@@ -4,6 +4,7 @@ public sealed record AppPaths(string SavePath, string BackupBasePath)
 {
     public string BackupsPath => Path.Combine(BackupBasePath, "backups");
     public string ConfigPath => Path.Combine(BackupBasePath, "config.json");
+    public string WandTemplatesPath => Path.Combine(BackupBasePath, "wand_templates");
 
     /// <summary>
     /// Defaults to the standard Windows locations. Override with --save-path / --backup-path

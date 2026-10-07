@@ -13,6 +13,7 @@ public sealed class NoitaSaveScummerApp : IDisposable
     private readonly IConfigurationService _configService;
     private readonly IBackupService _backupService;
     private readonly INoitaProcess _noita;
+    private readonly WandTemplateStore _wandTemplates;
     private readonly ApplicationState _state = new();
     private readonly ConsoleRenderer _renderer = new();
     private readonly SemaphoreSlim _ioLock = new(1, 1);
@@ -32,6 +33,7 @@ public sealed class NoitaSaveScummerApp : IDisposable
         _configService = configService;
         _backupService = backupService;
         _noita = noita;
+        _wandTemplates = new WandTemplateStore(paths.WandTemplatesPath);
     }
 
     public bool Initialize()
@@ -184,6 +186,7 @@ public sealed class NoitaSaveScummerApp : IDisposable
                 case ConsoleKey.F9: await FullRestoreInteractiveAsync(ct); break;
                 case ConsoleKey.F8: await PlayerRestoreInteractiveAsync(ct); break;
                 case ConsoleKey.F7: TogglePreservationInteractive(); break;
+                case ConsoleKey.F6: await WandToolsInteractiveAsync(ct); break;
                 case ConsoleKey.U: await UndoLastRestoreAsync(ct); break;
                 case ConsoleKey.B: await RunBackupAsync(BackupKind.Manual, skipIfUnchanged: false, ct); break;
                 case ConsoleKey.P: TogglePause(); break;
@@ -367,6 +370,77 @@ public sealed class NoitaSaveScummerApp : IDisposable
     }
 
     // ---------------------------------------------------------------- misc commands
+
+    private async Task WandToolsInteractiveAsync(CancellationToken ct)
+    {
+        var templates = _wandTemplates.List(out var problems);
+        switch (Prompts.AskWandAction(_renderer, templates.Count))
+        {
+            case ConsoleKey.S:
+                SaveWandTemplateInteractive();
+                break;
+            case ConsoleKey.G:
+                if (problems.Count > 0)
+                    _state.SetStatus($"{IconProvider.Warning} Skipped invalid template {problems[0]}", StatusDuration);
+                await GiveWandInteractiveAsync(templates, ct);
+                break;
+        }
+    }
+
+    private void SaveWandTemplateInteractive()
+    {
+        var playerXml = Path.Combine(_paths.SavePath, SaveLayout.PlayerFile);
+        if (!File.Exists(playerXml))
+        {
+            _state.SetStatus($"{IconProvider.Error} No player.xml in save00. Save & Quit a run that has the wand first.", StatusDuration);
+            return;
+        }
+
+        var wands = WandXml.ListWands(playerXml);
+        var hint = _noita.IsRunning()
+            ? $"{IconProvider.Warning} Noita is running: this shows your inventory as of the last save. Save & Quit for an up-to-date list."
+            : "Wands in your hotbar as of the last Save & Quit:";
+        var wand = ListMenu.Select(_renderer, wands, w => w.Label, "Save a wand as a template", hint);
+        if (wand is null)
+        {
+            if (wands.Count == 0)
+                _state.SetStatus($"{IconProvider.Error} No wands found in player.xml.", StatusDuration);
+            return;
+        }
+
+        var template = _wandTemplates.Save(WandXml.ExtractWand(playerXml, wand.Index), DateTime.Now);
+        _state.SetStatus($"{IconProvider.Success} Saved wand template '{template.Name}'. Give it to a new run with F6 then G.", StatusDuration);
+    }
+
+    private async Task GiveWandInteractiveAsync(IReadOnlyList<WandTemplate> templates, CancellationToken ct)
+    {
+        if (templates.Count == 0)
+        {
+            _state.SetStatus($"{IconProvider.Error} No saved wands. Get the wand in a run, Save & Quit, then F6 then S.", StatusDuration);
+            return;
+        }
+
+        var template = ListMenu.Select(_renderer, templates, t => $"{t.Name}  {t.Summary.Label}", "Give a saved wand to the current run",
+            "Added to the first free wand slot of the current save. An undo backup is taken first (U to undo).");
+        if (template is null || !await EnsureNoitaClosedAsync(ct)) return;
+
+        var wandXml = WandTemplateStore.Load(template);
+        await _ioLock.WaitAsync(ct);
+        try
+        {
+            _state.Busy = $"{IconProvider.Hourglass} Adding wand...";
+            var slot = -1;
+            var undo = await _backupService.EditPlayerXmlAsync((current, temp) => slot = WandXml.InjectWand(current, temp, wandXml), ct);
+            _lastUndoBackup = undo?.Name;
+            RefreshBackups();
+            _state.SetStatus($"{IconProvider.Success} Added {template.Summary.Name} to wand slot {slot + 1}. Start Noita and choose 'Continue'. (U = undo)", StatusDuration);
+        }
+        finally
+        {
+            _state.Busy = null;
+            _ioLock.Release();
+        }
+    }
 
     private void TogglePreservationInteractive()
     {

@@ -10,6 +10,12 @@ public interface IBackupService
     Task<BackupResult> CreateBackupAsync(BackupRequest request, CancellationToken ct = default);
     Task<RestoreResult> RestoreBackupAsync(string backupName, bool keepCurrentProgress, CancellationToken ct = default);
     Task<RestoreResult> RestorePlayerOnlyAsync(string backupName, (double X, double Y)? resetPosition, CancellationToken ct = default);
+
+    /// <summary>
+    /// Edits the live player.xml safely: takes an undo backup, runs <paramref name="edit"/>(currentPath, tempPath),
+    /// then atomically replaces player.xml with the temp file. Returns the undo backup.
+    /// </summary>
+    Task<BackupInfo?> EditPlayerXmlAsync(Action<string, string> edit, CancellationToken ct = default);
     IReadOnlyList<BackupInfo> GetAvailableBackups();
     CleanupResult CleanupOldBackups(int maxVersions, int maxUndoBackups);
     bool TogglePreservation(string backupName);
@@ -178,6 +184,29 @@ public sealed partial class BackupService : IBackupService
         }, ct);
 
         return new RestoreResult(backup, undo);
+    }
+
+    public async Task<BackupInfo?> EditPlayerXmlAsync(Action<string, string> edit, CancellationToken ct = default)
+    {
+        var current = Path.Combine(_savePath, SaveLayout.PlayerFile);
+        if (!File.Exists(current))
+            throw new InvalidOperationException("No player.xml in save00. Start a run, Save & Quit, then try again.");
+
+        var undo = await CreateUndoBackupAsync(ct);
+        var temp = current + ".scummer-tmp";
+        await Task.Run(() =>
+        {
+            try
+            {
+                edit(current, temp);
+                File.Move(temp, current, overwrite: true);
+            }
+            finally
+            {
+                if (File.Exists(temp)) File.Delete(temp);
+            }
+        }, ct);
+        return undo;
     }
 
     private async Task<BackupInfo?> CreateUndoBackupAsync(CancellationToken ct)

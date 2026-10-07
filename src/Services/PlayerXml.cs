@@ -13,11 +13,7 @@ public static class PlayerXml
     /// </summary>
     public static void WriteWithPosition(string sourcePath, string destinationPath, double x, double y)
     {
-        var document = new XmlDocument { PreserveWhitespace = true, XmlResolver = null };
-        using (var reader = XmlReader.Create(sourcePath, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
-        {
-            document.Load(reader);
-        }
+        var document = Load(sourcePath);
 
         var transform = document.SelectSingleNode("/Entity/_Transform") as XmlElement
             ?? throw new InvalidDataException("player.xml has no <Entity><_Transform> element; position not changed.");
@@ -25,27 +21,48 @@ public static class PlayerXml
         transform.SetAttribute("position.x", x.ToString("F6", CultureInfo.InvariantCulture));
         transform.SetAttribute("position.y", y.ToString("F6", CultureInfo.InvariantCulture));
 
-        var settings = new XmlWriterSettings
-        {
-            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), // no BOM
-            OmitXmlDeclaration = document.FirstChild is not XmlDeclaration,
-            Indent = false,
-        };
-        using var writer = XmlWriter.Create(destinationPath, settings);
-        document.Save(writer);
+        Save(document, destinationPath);
     }
 
     public static (double X, double Y)? ReadPosition(string path)
     {
-        var document = new XmlDocument { XmlResolver = null };
-        using (var reader = XmlReader.Create(path, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit }))
-        {
-            document.Load(reader);
-        }
+        var document = Load(path);
         if (document.SelectSingleNode("/Entity/_Transform") is not XmlElement transform) return null;
         return double.TryParse(transform.GetAttribute("position.x"), NumberStyles.Float, CultureInfo.InvariantCulture, out var x) &&
                double.TryParse(transform.GetAttribute("position.y"), NumberStyles.Float, CultureInfo.InvariantCulture, out var y)
             ? (x, y)
             : null;
     }
+
+    /// <summary>Loads an entity XML file preserving whitespace, with DTDs and external resolution disabled.</summary>
+    internal static XmlDocument Load(string path)
+    {
+        var document = new XmlDocument { PreserveWhitespace = true, XmlResolver = null };
+        using var reader = XmlReader.Create(path, SafeReaderSettings);
+        document.Load(reader);
+        return document;
+    }
+
+    internal static XmlDocument Parse(string xml)
+    {
+        var document = new XmlDocument { PreserveWhitespace = true, XmlResolver = null };
+        using var reader = XmlReader.Create(new StringReader(xml), SafeReaderSettings);
+        document.Load(reader);
+        return document;
+    }
+
+    /// <summary>Writes UTF-8 without BOM, keeping an XML declaration only if the original had one.</summary>
+    internal static void Save(XmlDocument document, string path)
+    {
+        var settings = new XmlWriterSettings
+        {
+            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
+            OmitXmlDeclaration = document.FirstChild is not XmlDeclaration,
+            Indent = false,
+        };
+        using var writer = XmlWriter.Create(path, settings);
+        document.Save(writer);
+    }
+
+    private static readonly XmlReaderSettings SafeReaderSettings = new() { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null };
 }

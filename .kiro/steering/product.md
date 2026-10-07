@@ -15,6 +15,7 @@ Noita players who want to undo deaths or retry sections. Core promise: never los
 - Timed backups (verified unchanged during copy, `[LIVE]`), automatic backup on Noita exit (`[CLEAN]`), skip unchanged
 - F9 full restore (atomic directory swap, optional keep-current-progress), F8 player-only restore (optional spawn reset)
 - Undo backup before every restore (U), preservation (F7), B backup now, P pause, C settings, Q quit
+- F6 wand tools: copy a real wand entity between saves (templates in `NoitaSaveBackups\wand_templates\`); never synthesize wand XML
 - Global hotkeys Ctrl+Alt+F5 quick-save / Ctrl+Alt+F9 quick-load (close Noita, restore newest, relaunch)
 
 ## Storage

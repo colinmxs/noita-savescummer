@@ -30,6 +30,7 @@ If you get a Windows Defender SmartScreen warning, click "More info," then "Run 
 | F9  | Full restore: world + player from a backup |
 | F8  | Player-only restore: backup's player into the current world (optionally at spawn) |
 | F7  | Preserve / unpreserve a backup (never auto-deleted) |
+| F6  | Wand tools: save a wand as a template, or give a saved wand to the current run |
 | U   | Undo the last restore |
 | B   | Back up now |
 | P   | Pause / resume the timer |
@@ -44,6 +45,13 @@ Menus show every backup (page with arrows / PgUp / PgDn, pick with 1-9 or Enter)
 |-----|--------|
 | Ctrl+Alt+F5 | Quick-save: back up now |
 | Ctrl+Alt+F9 | Quick-load: close Noita, restore the newest backup, relaunch Noita via Steam |
+
+### Starting a run with a wand (e.g. black hole)
+1. Get the wand once in any run, **Save & Quit**, press **F6** then **S** and pick it. It's saved to `NoitaSaveBackups\wand_templates\`.
+2. In a new run, **Save & Quit** right after starting, press **F6** then **G** and pick the template.
+3. Start Noita and choose **Continue**. The wand is in your first free wand slot. **U** undoes it.
+
+The wand is copied exactly as Noita saved it, so no mods are involved and the run is not marked as modded.
 
 ## Why restores used to break the world (fixed in 2.0)
 
