@@ -1,65 +1,68 @@
+using System.Globalization;
 using NoitaSaveScummer.Models;
+using NoitaSaveScummer.Services;
 
 namespace NoitaSaveScummer.UI;
 
+public sealed record MainScreenModel(
+    Configuration Config,
+    ApplicationState State,
+    AppPaths Paths,
+    IReadOnlyList<BackupInfo> Backups,
+    string? HotkeyProblem,
+    DateTime Now);
+
 public static class ConsoleDisplay
 {
-    public static void ShowMainInterface(Configuration config, ApplicationState state, string noitaPath, string backupPath)
+    public const int RecentBackupsShown = 5;
+
+    public static IReadOnlyList<string> BuildMainScreen(MainScreenModel m)
     {
-        Console.SetCursorPosition(0, 0);
-        Console.Clear();
-        
-        Console.WriteLine($"{IconProvider.Game} Noita Save Scummer - Running");
-        Console.WriteLine(IconProvider.Separator.PadRight(50, IconProvider.Separator[0]));
-        Console.WriteLine();
-        
-        Console.WriteLine($"{IconProvider.Folder} Noita Save: {noitaPath}");
-        Console.WriteLine($"{IconProvider.Save} Backup Location: {backupPath}");
-        Console.WriteLine();
-        
-        Console.WriteLine($"{IconProvider.Timer} Backup Interval: {config.BackupIntervalMinutes} minute(s)");
-        Console.WriteLine($"{IconProvider.Package} Max Backup Versions: {config.MaxBackupVersions}");
-        Console.WriteLine($"{IconProvider.Calendar} Last Backup: {(state.LastBackupTime == DateTime.MinValue ? "Never" : state.LastBackupTime.ToString("HH:mm:ss"))}");
-        
+        var lines = new List<string>();
+        var state = m.State;
+        var config = m.Config;
+
+        lines.Add($"{IconProvider.Game} Noita Save Scummer v{AppInfo.Version}");
+        lines.Add(new string(IconProvider.Separator[0], 60));
+        lines.Add($"{IconProvider.Folder} Save:    {m.Paths.SavePath}");
+        var preserved = m.Backups.Count(b => b.IsPreserved);
+        lines.Add($"{IconProvider.Save} Backups: {m.Paths.BackupsPath}  ({m.Backups.Count} stored, {preserved} preserved)");
+        lines.Add($"{IconProvider.Target} Noita:   {(state.IsNoitaRunning ? "RUNNING" : "not running")}");
+
+        string next;
         if (state.IsPaused)
-        {
-            Console.WriteLine($"{IconProvider.Pause} Status: PAUSED - {state.PausedTimeRemaining.Minutes:D2}:{state.PausedTimeRemaining.Seconds:D2} remaining when resumed");
-        }
+            next = $"PAUSED ({ApplicationState.FormatCountdown(state.PausedTimeRemaining)} left when resumed)";
         else
-        {
-            var timeRemaining = state.TimeUntilNextBackup;
-            if (timeRemaining.TotalSeconds > 0)
-            {
-                Console.WriteLine($"{IconProvider.Hourglass} Next Backup: {timeRemaining.Minutes:D2}:{timeRemaining.Seconds:D2}");
-            }
-            else
-            {
-                Console.WriteLine($"{IconProvider.Hourglass} Next Backup: Creating backup...");
-            }
-        }
-        
-        Console.WriteLine();
-        Console.WriteLine($"{IconProvider.Target} Controls:");
-        Console.WriteLine("   F9  - Select and restore backup (full save)");
-        Console.WriteLine("   F8  - Select and restore player.xml only");
-        Console.WriteLine("   F7  - Manage backup preservation");
-        Console.WriteLine("   P   - Pause/Resume timer");
-        Console.WriteLine("   C   - Configure settings");
-        Console.WriteLine("   Q   - Quit application");
-        Console.WriteLine();
-        Console.WriteLine($"{IconProvider.Document} Status: {(state.IsPaused ? "Paused" : "Running")}... (console window must be focused for hotkeys)");
-    }
+            next = ApplicationState.FormatCountdown(state.TimeUntilNextBackup(m.Now));
+        lines.Add($"{IconProvider.Timer} Every {config.BackupIntervalMinutes} min, keep {config.MaxBackupVersions}  |  Next backup: {next}");
 
-    public static void ShowMessage(string message, int line = 15)
-    {
-        Console.SetCursorPosition(0, line);
-        Console.WriteLine(message.PadRight(Console.WindowWidth - 1));
-    }
+        var last = state.LastBackupTime == DateTime.MinValue
+            ? "none this session"
+            : state.LastBackupTime.ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        lines.Add($"{IconProvider.Calendar} Last backup: {last}");
+        lines.Add(string.Empty);
 
-    public static void ClearMessage(int line = 15)
-    {
-        Console.SetCursorPosition(0, line);
-        Console.WriteLine("".PadRight(Console.WindowWidth - 1));
+        lines.Add("Recent backups:");
+        if (m.Backups.Count == 0)
+            lines.Add("   (none yet)");
+        foreach (var backup in m.Backups.Take(RecentBackupsShown))
+            lines.Add($"   {backup.DisplayName}");
+        lines.Add(string.Empty);
+
+        lines.Add("Controls (this window):");
+        lines.Add("   F9 Full restore        F8 Player-only restore   F7 Preserve/unpreserve");
+        lines.Add("   U  Undo last restore   B  Back up now           P  Pause/resume timer");
+        lines.Add("   C  Settings            Q  Quit");
+        if (m.HotkeyProblem is null)
+            lines.Add($"Global (in-game): {HotkeyBindings.LabelFor(HotkeyAction.QuickSave)} quick-save, " +
+                      $"{HotkeyBindings.LabelFor(HotkeyAction.QuickLoad)} quick-load (closes Noita, restores newest, relaunches)");
+        else
+            lines.Add($"Global hotkeys: {m.HotkeyProblem}");
+        lines.Add(string.Empty);
+
+        var status = state.GetStatus(m.Now);
+        lines.Add($"{IconProvider.Document} {(string.IsNullOrEmpty(status) ? (state.IsPaused ? "Paused" : "Running") : status)}");
+        return lines;
     }
 
     public static void ShowInitializationMessage()
@@ -70,7 +73,14 @@ public static class ConsoleDisplay
 
     public static void ShowShutdownMessage()
     {
+        try
+        {
+            Console.CursorVisible = true;
+        }
+        catch (Exception ex) when (ex is IOException or PlatformNotSupportedException)
+        {
+        }
         Console.Clear();
-        Console.WriteLine($"{IconProvider.Wave} Shutting down gracefully...");
+        Console.WriteLine($"{IconProvider.Wave} Shut down. Your backups are in the backups folder.");
     }
 }

@@ -23,14 +23,16 @@ jobs:
     - name: Get short SHA
       id: vars
       shell: bash
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      run: |
+        echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        echo "built=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
 
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build Windows (Development)
       run: |
-        dotnet publish `
+        dotnet publish noita-savescummer.csproj `
           --configuration Release `
           --runtime win-x64 `
           --self-contained true `
@@ -51,8 +53,14 @@ jobs:
           ./dev-builds/*.zip
         retention-days: 30
 
+    - name: Move dev-latest tag to this commit
+      shell: bash
+      run: |
+        git tag -f dev-latest
+        git push -f origin dev-latest
+
     - name: Create or update development release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: dev-latest
         name: "🚧 Development Build (Latest)"
@@ -64,7 +72,7 @@ jobs:
           
           **Commit:** ${{ github.sha }}
           **Short SHA:** ${{ steps.vars.outputs.sha_short }}
-          **Built:** $(Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC")
+          **Built:** ${{ steps.vars.outputs.built }}
           
           ## Download
           

@@ -9,36 +9,32 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
-    
+
     - name: Restore dependencies
       run: dotnet restore
-    
+
     - name: Build
       run: dotnet build --no-restore --configuration Release
-    
-    - name: Test Windows build
+
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal
+
+    - name: Test trimmed self-contained publish (same flags as release)
       run: |
-        if (Test-Path "tests") {
-          dotnet test --no-build --configuration Release --verbosity normal
-        } else {
-          Write-Host "No tests found, skipping test step"
-        }
-    
-    - name: Test self-contained publish
-      run: |
-        dotnet publish --configuration Release --runtime win-x64 --self-contained -p:PublishSingleFile=true -o test-publish
+        dotnet publish noita-savescummer.csproj --configuration Release --runtime win-x64 --self-contained true `
+          -p:PublishSingleFile=true -p:PublishTrimmed=true -p:TrimMode=partial -o test-publish
         if (Test-Path "test-publish/noita-savescummer.exe") {
-          Write-Host "✅ Self-contained executable created successfully"
+          Write-Host "Self-contained executable created successfully"
           Remove-Item -Recurse -Force test-publish
         } else {
-          Write-Error "❌ Failed to create self-contained executable"
+          Write-Error "Failed to create self-contained executable"
           exit 1
         }

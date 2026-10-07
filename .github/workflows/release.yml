@@ -29,9 +29,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    - name: Test
+      run: dotnet test --configuration Release --no-restore
+
     - name: Publish Windows x64
       run: |
-        dotnet publish `
+        dotnet publish noita-savescummer.csproj `
           --configuration Release `
           --runtime win-x64 `
           --self-contained true `
@@ -57,7 +60,7 @@ jobs:
         fi
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.version }}
         name: Noita Save Scummer ${{ steps.version.outputs.version }}
@@ -89,11 +92,7 @@ jobs:
           
           ## 🔄 What's New
           
-          - Automated backup system with configurable intervals
-          - Multiple versioned backups with cleanup
-          - Interactive restore with backup selection
-          - Pause/Resume functionality
-          - Clean, intuitive console interface
+          See [VERSION.md](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/VERSION.md) for the changelog.
           
           ---
           

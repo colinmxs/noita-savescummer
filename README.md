@@ -8,7 +8,7 @@ A lightweight console application for automatically backing up and restoring Noi
 
 ## Features
 
-Automatically backs up your Noita saves on a timer and lets you restore them with hotkeys when you die or want to retry something.
+Backs up your Noita save on a timer and every time you Save & Quit, and restores it with one key (or one in-game hotkey) without corrupting the world.
 
 ## How to Use
 
@@ -18,41 +18,66 @@ Automatically backs up your Noita saves on a timer and lets you restore them wit
 
 If you get a Windows Defender SmartScreen warning, click "More info," then "Run anyway." This happens because the application is not code-signed.
 
-### First-Time Setup
-When you first run the application, you will be asked to configure:
-- **Backup Interval**: The time in minutes between automatic backups.
-- **Backup Retention**: The maximum number of backups to store.
+### Recommended workflow
+- **Save & Quit** in Noita whenever you reach a spot you want to keep. The app takes a `[CLEAN]` backup the moment Noita exits. These are the most reliable.
+- Timed backups also run while you play. They are only kept if no file changed during the copy, and are tagged `[LIVE]`.
+- After a restore, start Noita and choose **Continue**.
 
-### Controls
+### Controls (app window)
 
-- **F9**: **Full Restore**. Restores the entire save directory, including world and player data.
-- **F8**: **Player-Only Restore**. Restores only `player.xml`, preserving the current world state.
-- **F7**: **Preserve Backup**. Toggles a "preserved" state for a backup, protecting it from automatic cleanup.
-- **P**: Pause or resume the automatic backup timer.
-- **C**: Change the backup interval and retention settings.
-- **Q**: Quit the application.
+| Key | Action |
+|-----|--------|
+| F9  | Full restore: world + player from a backup |
+| F8  | Player-only restore: backup's player into the current world (optionally at spawn) |
+| F7  | Preserve / unpreserve a backup (never auto-deleted) |
+| U   | Undo the last restore |
+| B   | Back up now |
+| P   | Pause / resume the timer |
+| C   | Settings |
+| Q   | Quit |
 
-## Restore Options
+Menus show every backup (page with arrows / PgUp / PgDn, pick with 1-9 or Enter).
 
-- **Full Restore (F9)**: Reverts your game to a previous state completely. This process is now safer, restoring only essential world and player data to prevent save corruption. Use this to recover from a death or to practice a specific part of the game.
+### Global hotkeys (work while Noita is focused)
 
-- **Player-Only Restore (F8)**: Restores your character's health, inventory, and stats from a backup, but keeps the current world map. This is useful if you want to continue exploring the current world with a previous version of your character. You can choose to either respawn at the cave entrance or at your character's last saved location.
+| Key | Action |
+|-----|--------|
+| Ctrl+Alt+F5 | Quick-save: back up now |
+| Ctrl+Alt+F9 | Quick-load: close Noita, restore the newest backup, relaunch Noita via Steam |
+
+## Why restores used to break the world (fixed in 2.0)
+
+Noita streams the world to disk while you play. `save00/world/` holds one file per chunk plus `.stream_info`, which stores the pixel-scene **background list**, camera values and the table of loaded chunks. These files are only consistent with each other when written together, which happens on Save & Quit.
+
+Version 1.x could mix moments in time in three ways, and each one produces offset or missing backgrounds and structures:
+1. It copied `save00` while Noita was writing, so one backup could hold chunks from different moments.
+2. It restored while Noita was running. The game then overwrote the restored files from memory on exit.
+3. Full restore copied files over the current save and left `session_numbers.salakieli` behind, so files from the newer run survived.
+
+Version 2.0:
+- Verifies each backup was not modified during the copy and retries if it was.
+- Backs up automatically when Noita exits.
+- Refuses to restore while Noita is running, or force-closes it if you choose.
+- Builds the restored `save00` completely, then swaps it in with a directory rename, so no newer-run files survive.
 
 ## File Locations
 
-- **Noita Save Directory**: `C:\Users\%USERNAME%\AppData\LocalLow\Nolla_Games_Noita\save00`
+- **Noita Save Directory**: `%USERPROFILE%\AppData\LocalLow\Nolla_Games_Noita\save00`
 - **Backups**: `%USERPROFILE%\Documents\NoitaSaveBackups\backups\`
 - **Configuration**: `%USERPROFILE%\Documents\NoitaSaveBackups\config.json`
 
-## Building from Source
+Override with `--save-path <dir>` / `--backup-path <dir>` or the `NOITA_SAVE_PATH` / `NOITA_SCUMMER_BACKUP_PATH` environment variables.
 
-To build the application from source:
+By default a full restore keeps your current unlocks, stats and mod settings (`persistent/`, `stats/`, `mod_config.xml`, `mod_settings.bin`). Turn this off in settings to restore an exact copy.
+
+## Building from Source
 
 ```bash
 git clone https://github.com/colinmxs/noita-savescummer.git
 cd noita-savescummer
 dotnet build --configuration Release
-dotnet run
+dotnet test
+dotnet run --project noita-savescummer.csproj
 ```
 
-The project is built with .NET 9.0 and has no external dependencies.
+The project is built with .NET 9.0. The app has no third-party dependencies; the test project uses xUnit.

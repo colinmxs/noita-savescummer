@@ -1,23 +1,21 @@
 # Build Status
 
-This document provides a summary of the project's current build status and technical configuration.
-
 ## Current Status
 
-- **Version**: v1.2.1
+- **Version**: v2.0.0
 - **Framework**: .NET 9.0
 - **Platform**: Windows 10/11 (64-bit)
-- **Builds**: Automated builds for Windows are passing.
-- **Releases**: The release workflow is operational.
+- **Tests**: xUnit suite in `tests/NoitaSaveScummer.Tests` (30 tests), run by CI
+- **Publish**: trimmed single-file `win-x64` publish is warning-free and smoke-tested in CI
 
 ## Technical Details
 
-- **Architecture**: The project follows a clean architecture with a separation of concerns into Models, Services, and UI layers.
-- **Dependencies**: This project has no third-party dependencies and uses only built-in .NET libraries.
-- **Serialization**: JSON serialization is handled using source generation to ensure compatibility with Ahead-of-Time (AOT) compilation.
-- **Console Display**: The console UI uses Unicode detection with an ASCII fallback to ensure proper display of icons.
-- **Distribution**: The application is distributed as a self-contained executable that does not require a separate .NET runtime installation.
+- **Architecture**: Models / Services / UI layers. Services do no console I/O and are tested against temp directories.
+- **Dependencies**: No third-party dependencies in the app (xUnit in tests only).
+- **Serialization**: Source-generated JSON only. Reflection-based JSON is disabled in every configuration so mistakes fail in tests, not in release.
+- **Console Display**: Diff-based renderer (no flicker); Unicode icons with ASCII fallback.
 
 ## Known Issues
 
-- **Windows SmartScreen Warning**: Because the executable is not code-signed, Windows Defender may show a warning on first run. The workaround is to click "More info" and then "Run anyway."
+- **Windows SmartScreen Warning**: The executable is not code-signed. Click "More info" then "Run anyway."
+- **Noita running as administrator**: the app cannot force-close it; close Noita manually before restoring.
