@@ -5,7 +5,7 @@
 - **Version**: v2.0.0
 - **Framework**: .NET 9.0
 - **Platform**: Windows 10/11 (64-bit)
-- **Tests**: xUnit suite in `tests/NoitaSaveScummer.Tests` (30 tests), run by CI
+- **Tests**: xUnit suite in `tests/NoitaSaveScummer.Tests` (37 tests), run by CI
 - **Publish**: trimmed single-file `win-x64` publish is warning-free and smoke-tested in CI
 
 ## Technical Details

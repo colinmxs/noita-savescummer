@@ -14,7 +14,8 @@ This document contains the release history and changelog for the Noita Save Scum
 *   **Feature**: Automatic undo backup before every restore (U to undo).
 *   **Feature**: Full restore keeps current unlocks/stats by default.
 *   **Feature**: B = back up now. Paged menus show every backup with tags. Recent backups appear on the main screen. Path overrides.
-*   **Dev**: xUnit test suite (30 tests), CI runs tests and a trimmed publish, release notes link here.
+*   **Feature**: Wand tools (F6): save any wand from a save as a template, then add it to another run's first free wand slot (undo backup first; cooldown counters reset).
+*   **Dev**: xUnit test suite (37 tests), CI runs tests and a trimmed publish, release notes link here.
 
 ## Version 1.2.1
 *   **Critical Fix**: Overhauled the full restore (F9) logic to prevent world corruption. The restore process now only copies essential files (`player.xml`, `world_state.xml`, and the `world` folder), significantly improving safety and reliability.

@@ -15,7 +15,9 @@ src/
     BackupService.cs            Consistent snapshot backup, atomic swap restore, undo, retention, recovery
     SaveLayout.cs               What is per-run vs cross-run in save00
     SnapshotManifest.cs         File size/mtime manifest to detect writes during copy
-    PlayerXml.cs                player.xml position edit (invariant culture)
+    PlayerXml.cs                player.xml load/save + position edit (invariant culture)
+    WandXml.cs                  List/extract/inject wands in inventory_quick
+    WandTemplateStore.cs        wand_templates/*.xml
     PreservationService.cs      preserved_backups.json
     ConfigurationService.cs     config.json load/save (atomic)
     NoitaProcess.cs             INoitaProcess: detect / force-close / launch Noita
@@ -26,7 +28,8 @@ src/
   UI/
     ConsoleRenderer.cs          Diff-based flicker-free renderer
     ConsoleDisplay.cs           Main screen model -> lines
-    BackupSelectionMenu.cs      Paged backup picker
+    ListMenu.cs                 Generic paged picker
+    BackupSelectionMenu.cs      Backup picker (ListMenu)
     Prompts.cs                  Noita-running / reset-location / confirm prompts
     ConfigurationPrompts.cs     First-run and settings prompts
     IconProvider.cs             Unicode/ASCII icons
